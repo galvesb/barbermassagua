@@ -37,6 +37,25 @@ export default function Home() {
     setHasSelected(services.some(service => service.selected));
   }, [services]);
 
+  useEffect(() => {
+    const body = document.body;
+    const html = document.documentElement;
+
+    // Check if it's mobile
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+      body.style.overflow = 'hidden';
+      html.style.overflow = 'hidden';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      body.style.overflow = '';
+      html.style.overflow = '';
+    };
+  }, []);
+
   const toggleService = (index) => {
     const updated = [...services];
     updated[index].selected = !updated[index].selected;
