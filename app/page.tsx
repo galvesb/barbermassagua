@@ -230,7 +230,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
-      <div className="w-full max-w-sm h-[80vh] bg-[#1f1f29] rounded-3xl p-6 text-white flex flex-col">
+      <div className="w-full max-w-sm h-[80vh] bg-[#1f1f29] rounded-3xl p-6 text-white flex flex-col -mt-10">
         <div className="flex justify-between items-center mb-6">
           <div>
             <p className="text-lg text-amber-500 font-semibold">Bem-vindo</p>
