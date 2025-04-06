@@ -29,6 +29,7 @@ export default function Home() {
   const [hasSelected, setHasSelected] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedHour, setSelectedHour] = useState(null);
+  const [showSummary, setShowSummary] = useState(false);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -72,7 +73,69 @@ export default function Home() {
 
   const hasSelectedBarber = barbers.some(b => b.selected);
 
+  const handleFinalizar = () => {
+    setShowSummary(true);
+  };
+
   const renderContent = () => {
+    if (showSummary) {
+      return (
+        <div className="bg-[#2a2a38] p-4 rounded-xl text-white text-sm h-full flex flex-col">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold mb-2">Resumo do Agendamento</h2>
+            <div className="bg-amber-500 w-16 h-1 mx-auto"></div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto scrollbar-none md:scrollbar-thin md:scrollbar-thumb-gray-600 md:scrollbar-track-transparent pr-2">
+            <div className="space-y-4">
+              <div className="flex flex-col">
+                <h3 className="font-semibold mb-2">Serviços Selecionados</h3>
+                <div className="space-y-2">
+                  {services
+                    .filter(service => service.selected)
+                    .map((service, index) => (
+                      <div key={index} className="flex items-center justify-between bg-[#1f1f29] p-3 rounded-lg">
+                        <span className="text-sm">{service.name}</span>
+                        <span className="text-amber-500 text-sm">{service.price}</span>
+                      </div>
+                    ))}
+                </div>
+                <div className="flex justify-between items-center mt-3">
+                  <span className="font-bold">Total</span>
+                  <span className="text-amber-500 font-bold">R${total.toFixed(2).replace('.', ',')}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                <h3 className="font-semibold mb-2">Barbeiro</h3>
+                <div className="flex items-center bg-[#1f1f29] p-3 rounded-lg">
+                  <div className="text-amber-500 mr-3">{barbers.find(b => b.selected)?.icon}</div>
+                  <span className="text-sm">{barbers.find(b => b.selected)?.name}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                <h3 className="font-semibold mb-2">Data e Horário</h3>
+                <div className="flex flex-col bg-[#1f1f29] p-3 rounded-lg">
+                  <span className="text-sm">{selectedDay ? `${selectedDay}/${new Date().toLocaleString('default', { month: 'long' })}/${new Date().getFullYear()}` : 'Data não selecionada'}</span>
+                  <span className="text-sm mt-1">{selectedHour || 'Horário não selecionado'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-auto">
+            <button
+              onClick={() => setShowSummary(false)}
+              className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
+            >
+              Novo Agendamento
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     if (activeTab === "SERVIÇOS") {
       return (
         <div className="flex flex-col h-full">
@@ -213,7 +276,7 @@ export default function Home() {
               </div>
               {selectedHour && (
                 <button
-                  onClick={() => alert("Agendamento concluído!")}
+                  onClick={handleFinalizar}
                   className="w-full font-bold text-sm py-3 rounded-full bg-green-600 text-white hover:bg-green-700 transition"
                 >
                   FINALIZAR
