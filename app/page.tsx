@@ -241,7 +241,7 @@ export default function Home() {
                 hasSelectedBarber ? 'bg-amber-500 text-black' : 'bg-gray-600 text-gray-300 cursor-not-allowed'
               }`}
             >
-              AGENDAR
+              SELECIONAR DATA E HORA
             </button>
           </div>
         </div>
