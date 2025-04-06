@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from "react";
-import { Menu, Scissors, CheckCircle, PlusCircle, SprayCan, User, Brush, ChevronLeft, ChevronRight, Wand2, Bath, Smile, ChevronUp, ChevronDown } from "lucide-react";
+import { Menu, Scissors, CheckCircle, PlusCircle, SprayCan, User, Brush, ChevronLeft, ChevronRight, Wand2, Bath, Smile, ChevronUp, ChevronDown, X } from "lucide-react";
 
 const initialServices = [
   { name: "Corte de Cabelo", price: "R$40,00", value: 40, icon: <Scissors />, selected: false },
@@ -97,8 +97,24 @@ export default function Home() {
                     .filter(service => service.selected)
                     .map((service, index) => (
                       <div key={index} className="flex items-center justify-between bg-[#1f1f29] p-3 rounded-lg">
-                        <span className="text-sm">{service.name}</span>
-                        <span className="text-amber-500 text-sm">{service.price}</span>
+                        <div className="flex items-center space-x-3">
+                          <div className="text-amber-500">{service.icon}</div>
+                          <span className="text-sm">{service.name}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-amber-500 text-sm">{service.price}</span>
+                          <button
+                            onClick={() => {
+                              const updated = [...services];
+                              updated[index].selected = false;
+                              setServices(updated);
+                              setHasSelected(services.some(service => service.selected));
+                            }}
+                            className="p-1 text-gray-400 hover:text-amber-500 transition"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
                       </div>
                     ))}
                 </div>
