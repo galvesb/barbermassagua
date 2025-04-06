@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Menu, Scissors, CheckCircle, PlusCircle, SprayCan, User, Brush, ChevronLeft, ChevronRight, Wand2, Bath, Smile, ChevronUp, ChevronDown, X } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/useAuth';
+import { supabase } from '../lib/supabaseClient';
 
 const initialServices = [
   { name: "Corte de Cabelo", price: "R$40,00", value: 40, icon: <Scissors />, selected: false },
@@ -40,6 +41,29 @@ function MainContent() {
   const [hasSelected, setHasSelected] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const scrollRef = useRef(null);
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+      
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      setProfile(profileData);
+    };
+
+    fetchProfile();
+  }, [user]);
 
   useEffect(() => {
     const sum = services.reduce((acc, item) => item.selected ? acc + item.value : acc, 0);
@@ -342,7 +366,7 @@ function MainContent() {
           <div className="flex justify-between items-center mb-6">
             <div>
               <p className="text-lg text-amber-500 font-semibold">Bem-vindo</p>
-              <h1 className="text-xl font-bold">Guilherme!</h1>
+              <h1 className="text-xl font-bold">{profile?.name || 'Usuário'}</h1>
             </div>
             <div className="text-right">
               <p className="text-sm text-amber-400">Total: R${total.toFixed(2).replace('.', ',')}</p>
