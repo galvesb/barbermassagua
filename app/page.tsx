@@ -294,37 +294,43 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
       <div className="w-full max-w-sm h-[80vh] bg-[#1f1f29] rounded-3xl p-6 text-white flex flex-col -mt-20">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <p className="text-lg text-amber-500 font-semibold">Bem-vindo</p>
-            <h1 className="text-xl font-bold">Guilherme!</h1>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-amber-400">Total: R${total.toFixed(2).replace('.', ',')}</p>
-          </div>
-        </div>
+        {showSummary ? (
+          renderContent()
+        ) : (
+          <>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <p className="text-lg text-amber-500 font-semibold">Bem-vindo</p>
+                <h1 className="text-xl font-bold">Guilherme!</h1>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-amber-400">Total: R${total.toFixed(2).replace('.', ',')}</p>
+              </div>
+            </div>
 
-        <div className="flex justify-between bg-[#2a2a38] rounded-full p-1 mb-4">
-          {["SERVIÇOS", "BARBEIROS", "CALENDÁRIO"].map(tab => (
-            <button
-              key={tab}
-              onClick={() => {
-                if (tab === "BARBEIROS" && !hasSelected) return;
-                if (tab === "CALENDÁRIO" && !hasSelectedBarber) return;
-                setActiveTab(tab);
-              }}
-              className={`flex-1 py-2 rounded-full text-xs font-bold ${
-                activeTab === tab ? 'bg-amber-500 text-black' : 'text-white'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+            <div className="flex justify-between bg-[#2a2a38] rounded-full p-1 mb-4">
+              {["SERVIÇOS", "BARBEIROS", "CALENDÁRIO"].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    if (tab === "BARBEIROS" && !hasSelected) return;
+                    if (tab === "CALENDÁRIO" && !hasSelectedBarber) return;
+                    setActiveTab(tab);
+                  }}
+                  className={`flex-1 py-2 rounded-full text-xs font-bold ${
+                    activeTab === tab ? 'bg-amber-500 text-black' : 'text-white'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
 
-        <div className="flex-1 overflow-hidden">
-          {renderContent()}
-        </div>
+            <div className="flex-1 overflow-hidden">
+              {renderContent()}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
