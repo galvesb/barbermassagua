@@ -74,11 +74,13 @@ export default function Home() {
   const hasSelectedBarber = barbers.some(b => b.selected);
 
   const handleFinalizar = () => {
-    setShowSummary(true);
+    setActiveTab("RESUMO");
   };
 
+  const canShowSummary = selectedDay && selectedHour;
+
   const renderContent = () => {
-    if (showSummary) {
+    if (activeTab === "RESUMO") {
       return (
         <div className="bg-[#2a2a38] p-4 rounded-xl text-white text-sm h-full flex flex-col">
           <div className="text-center mb-6">
@@ -126,10 +128,17 @@ export default function Home() {
 
           <div className="mt-auto">
             <button
-              onClick={() => setShowSummary(false)}
+              onClick={() => {
+                setActiveTab("SERVIÇOS");
+                setHasSelected(false);
+                setServices(initialServices);
+                setBarbers(initialBarbers);
+                setSelectedDay(null);
+                setSelectedHour(null);
+              }}
               className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
             >
-              Novo Agendamento
+              Agendar
             </button>
           </div>
         </div>
@@ -309,7 +318,12 @@ export default function Home() {
             </div>
 
             <div className="flex justify-between bg-[#2a2a38] rounded-full p-1 mb-4">
-              {["SERVIÇOS", "BARBEIROS", "CALENDÁRIO"].map(tab => (
+              {[
+                "SERVIÇOS",
+                "BARBEIROS",
+                "CALENDÁRIO",
+                ...(canShowSummary ? ["RESUMO"] : [])
+              ].map(tab => (
                 <button
                   key={tab}
                   onClick={() => {
