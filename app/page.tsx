@@ -5,7 +5,7 @@ import { Menu, Scissors, CheckCircle, PlusCircle, SprayCan, User, Brush, Chevron
 
 const initialServices = [
   { name: "Corte de Cabelo", price: "R$40,00", value: 40, icon: <Scissors />, selected: false },
-  { name: "Barbear", price: "R$25,00", value: 25, icon: <SprayCan />, selected: true },
+  { name: "Barbear", price: "R$25,00", value: 25, icon: <SprayCan />, selected: false },
   { name: "Tratamento", price: "R$35,00", value: 35, icon: <SprayCan />, selected: false },
   { name: "Cuidado com a Barba", price: "R$30,00", value: 30, icon: <User />, selected: false },
   { name: "Estilo de Cabelo", price: "R$45,00", value: 45, icon: <Brush />, selected: false },
