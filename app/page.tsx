@@ -15,7 +15,7 @@ const initialServices = [
 ];
 
 const initialBarbers = [
-  { name: "Carlos Oliveira", role: "Especialista em cortes", icon: <User />, selected: false },
+  { name: "Guilherme Barros", role: "Especialista em cortes", icon: <User />, selected: false },
   { name: "Marcos Silva", role: "Barbeiro tradicional", icon: <User />, selected: false },
   { name: "João Souza", role: "Fade e navalhado", icon: <User />, selected: false },
   { name: "Pedro Lima", role: "Designer de barba", icon: <User />, selected: false },
@@ -145,12 +145,15 @@ export default function Home() {
           <div className="mt-auto">
             <button
               onClick={() => {
-                setActiveTab("SERVIÇOS");
                 setHasSelected(false);
-                setServices(initialServices);
+                setServices(services.map(service => ({
+                  ...service,
+                  selected: false
+                })));
                 setBarbers(initialBarbers);
                 setSelectedDay(null);
                 setSelectedHour(null);
+                setActiveTab("SERVIÇOS");
               }}
               className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
             >
