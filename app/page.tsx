@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from "react";
-import { Menu, Scissors, CheckCircle, PlusCircle, SprayCan, User, Brush, ChevronLeft, ChevronRight, Wand2, Bath, Smile, ChevronUp, ChevronDown, X } from "lucide-react";
+import { Menu, Scissors, CheckCircle, PlusCircle, SprayCan, User, Brush, ChevronLeft, ChevronRight, Wand2, Bath, Smile, ChevronUp, ChevronDown, X, Power } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/useAuth';
 import { supabase } from '../lib/supabaseClient';
@@ -368,8 +368,19 @@ function MainContent() {
               <p className="text-lg text-amber-500 font-semibold">Bem-vindo</p>
               <h1 className="text-xl font-bold">{profile?.name || 'Usuário'}</h1>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-amber-400">Total: R${total.toFixed(2).replace('.', ',')}</p>
+            <div className="flex flex-col items-end space-y-2">
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.href = '/login';
+                }}
+                className="p-1.5 bg-transparent hover:bg-red-500 hover:text-white rounded-full transition-colors duration-200"
+              >
+                <Power className="text-red-500" size={18} />
+              </button>
+              <div className="text-right">
+                <p className="text-sm text-amber-400">Total: R${total.toFixed(2).replace('.', ',')}</p>
+              </div>
             </div>
           </div>
         )}
