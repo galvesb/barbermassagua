@@ -1,15 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Lock, Mail, User } from 'lucide-react';
+import { registerUser } from '../../lib/supabase';
 
 export default function Register() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,10 +24,30 @@ export default function Register() {
     }));
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    // TODO: Implement registration logic
-    window.location.href = '/login';
+    setError('');
+    setLoading(true);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('As senhas não coincidem');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await registerUser({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name
+      });
+
+      router.push('/login');
+    } catch (error) {
+      setError(error.message || 'Erro ao criar conta');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,6 +57,12 @@ export default function Register() {
           <h1 className="text-3xl font-bold mb-2">Criar Conta</h1>
           <p className="text-gray-400">Cadastre-se para agendar seus serviços</p>
         </div>
+
+        {error && (
+          <div className="bg-red-600/10 p-3 rounded-lg mb-6 text-red-400 text-center">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleRegister} className="space-y-6">
           <div>
@@ -48,6 +79,7 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="Digite seu nome"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+                required
               />
             </div>
           </div>
@@ -66,6 +98,7 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="Digite seu email"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+                required
               />
             </div>
           </div>
@@ -84,6 +117,7 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="Digite sua senha"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+                required
               />
             </div>
           </div>
@@ -102,15 +136,19 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="Confirme sua senha"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+                required
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-amber-500 text-black py-3 rounded-lg font-bold text-sm hover:bg-amber-600 transition-colors"
+            disabled={loading}
+            className={`w-full bg-amber-500 text-black py-3 rounded-lg font-bold text-sm transition-colors ${
+              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-amber-600'
+            }`}
           >
-            Criar Conta
+            {loading ? 'Criando...' : 'Criar Conta'}
           </button>
 
           <div className="text-center text-gray-400">

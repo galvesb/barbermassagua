@@ -1,17 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Lock, Mail } from 'lucide-react';
+import { useAuth } from '../../lib/useAuth';
 
 export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const { signIn, loading } = useAuth();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // TODO: Implement login logic
-    window.location.href = '/';
+    setError('');
+
+    try {
+      await signIn(email, password);
+      router.push('/');
+    } catch (error) {
+      setError(error.message || 'Erro ao fazer login');
+    }
   };
 
   return (
@@ -21,6 +32,12 @@ export default function Login() {
           <h1 className="text-3xl font-bold mb-2">Bem-vindo</h1>
           <p className="text-gray-400">Faça login para continuar</p>
         </div>
+
+        {error && (
+          <div className="bg-red-600/10 p-3 rounded-lg mb-6 text-red-400 text-center">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
@@ -36,6 +53,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Digite seu email"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+                required
               />
             </div>
           </div>
@@ -53,6 +71,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Digite sua senha"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+                required
               />
               <button
                 type="button"
@@ -66,9 +85,12 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-amber-500 text-black py-3 rounded-lg font-bold text-sm hover:bg-amber-600 transition-colors"
+            disabled={loading}
+            className={`w-full bg-amber-500 text-black py-3 rounded-lg font-bold text-sm transition-colors ${
+              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-amber-600'
+            }`}
           >
-            Entrar
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
 
           <div className="text-center text-gray-400">

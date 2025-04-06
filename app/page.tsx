@@ -2,6 +2,8 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Menu, Scissors, CheckCircle, PlusCircle, SprayCan, User, Brush, ChevronLeft, ChevronRight, Wand2, Bath, Smile, ChevronUp, ChevronDown, X } from "lucide-react";
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../lib/useAuth';
 
 const initialServices = [
   { name: "Corte de Cabelo", price: "R$40,00", value: 40, icon: <Scissors />, selected: false },
@@ -20,14 +22,22 @@ const initialBarbers = [
   { name: "Pedro Lima", role: "Designer de barba", icon: <User />, selected: false },
 ];
 
-export default function Home() {
-  const [activeTab, setActiveTab] = useState("SERVIÇOS");
+function MainContent() {
+  // Definindo constantes para os tabs
+  const TAB_SERVICES = 'SERVICES';
+  const TAB_BARBERS = 'BARBERS';
+  const TAB_CALENDAR = 'CALENDAR';
+  const TAB_SUMMARY = 'SUMMARY';
+
+  // Estados da aplicação
+  const [activeTab, setActiveTab] = useState(TAB_SERVICES);
   const [services, setServices] = useState(initialServices);
   const [barbers, setBarbers] = useState(initialBarbers);
   const [total, setTotal] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
   const [hasSelected, setHasSelected] = useState(false);
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [selectedHour, setSelectedHour] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
   const scrollRef = useRef(null);
 
@@ -73,13 +83,13 @@ export default function Home() {
   const hasSelectedBarber = barbers.some(b => b.selected);
 
   const handleFinalizar = () => {
-    setActiveTab("RESUMO");
+    setActiveTab(TAB_SUMMARY);
   };
 
-  const canShowSummary = selectedDay && selectedHour;
+  const canShowSummary = selectedDate && selectedTime;
 
   const renderContent = () => {
-    if (activeTab === "RESUMO") {
+    if (activeTab === TAB_SUMMARY) {
       return (
         <div className="bg-[#2a2a38] p-4 rounded-xl text-white text-sm h-full flex flex-col">
           <div className="text-center mb-6">
@@ -134,8 +144,8 @@ export default function Home() {
               <div className="flex flex-col">
                 <h3 className="font-semibold mb-2">Data e Horário</h3>
                 <div className="flex flex-col bg-[#1f1f29] p-3 rounded-lg">
-                  <span className="text-sm">{selectedDay ? `${selectedDay}/${new Date().toLocaleString('default', { month: 'long' })}/${new Date().getFullYear()}` : 'Data não selecionada'}</span>
-                  <span className="text-sm mt-1">{selectedHour || 'Horário não selecionado'}</span>
+                  <span className="text-sm">{selectedDate ? `${selectedDate.getDate()}/${new Date().toLocaleString('default', { month: 'long' })}/${new Date().getFullYear()}` : 'Data não selecionada'}</span>
+                  <span className="text-sm mt-1">{selectedTime || 'Horário não selecionado'}</span>
                 </div>
               </div>
             </div>
@@ -150,9 +160,9 @@ export default function Home() {
                   selected: false
                 })));
                 setBarbers(initialBarbers);
-                setSelectedDay(null);
-                setSelectedHour(null);
-                setActiveTab("SERVIÇOS");
+                setSelectedDate(new Date());
+                setSelectedTime(null);
+                setActiveTab(TAB_SERVICES);
                 window.location.href = '/confirmation';
               }}
               className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
@@ -164,7 +174,7 @@ export default function Home() {
       );
     }
 
-    if (activeTab === "SERVIÇOS") {
+    if (activeTab === TAB_SERVICES) {
       return (
         <div className="flex flex-col h-full">
           <div className="flex-1 space-y-4 pr-2 overflow-y-auto scrollbar-none md:scrollbar-thin md:scrollbar-thumb-gray-600 md:scrollbar-track-transparent">
@@ -194,7 +204,7 @@ export default function Home() {
           <div className="mt-6">
             <button
               disabled={!hasSelected}
-              onClick={() => hasSelected && setActiveTab("BARBEIROS")}
+              onClick={() => hasSelected && setActiveTab(TAB_BARBERS)}
               className={`w-full font-bold text-sm py-3 rounded-full transition-colors duration-300 ${
                 hasSelected ? 'bg-amber-500 text-black' : 'bg-gray-600 text-gray-300 cursor-not-allowed'
               }`}
@@ -206,7 +216,7 @@ export default function Home() {
       );
     }
 
-    if (activeTab === "BARBEIROS") {
+    if (activeTab === TAB_BARBERS) {
       return (
         <div className="flex flex-col h-full">
           <div className="flex-1 space-y-4 pr-2 overflow-y-auto scrollbar-none md:scrollbar-thin md:scrollbar-thumb-gray-600 md:scrollbar-track-transparent">
@@ -236,7 +246,7 @@ export default function Home() {
           <div className="mt-6">
             <button
               disabled={!hasSelectedBarber}
-              onClick={() => hasSelectedBarber && setActiveTab("CALENDÁRIO")}
+              onClick={() => hasSelectedBarber && setActiveTab(TAB_CALENDAR)}
               className={`w-full font-bold text-sm py-3 rounded-full transition-colors duration-300 ${
                 hasSelectedBarber ? 'bg-amber-500 text-black' : 'bg-gray-600 text-gray-300 cursor-not-allowed'
               }`}
@@ -247,7 +257,7 @@ export default function Home() {
         </div>
       );
     }
-    if (activeTab === "CALENDÁRIO") {
+    if (activeTab === TAB_CALENDAR) {
       const today = new Date();
       const currentMonth = today.toLocaleString('default', { month: 'long' });
       const currentYear = today.getFullYear();
@@ -264,9 +274,9 @@ export default function Home() {
         calendarCells.push(
           <div
             key={day}
-            onClick={() => setSelectedDay(day)}
+            onClick={() => setSelectedDate(new Date(today.getFullYear(), today.getMonth(), day))}
             className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors duration-200 cursor-pointer ${
-              selectedDay === day ? 'bg-green-600 text-white' : isToday ? 'bg-amber-700 text-black' : 'text-white hover:bg-amber-600 hover:text-black'
+              selectedDate.getDate() === day ? 'bg-green-600 text-white' : isToday ? 'bg-amber-700 text-black' : 'text-white hover:bg-amber-600 hover:text-black'
             }`}
           >
             {day}
@@ -286,23 +296,23 @@ export default function Home() {
             {calendarCells}
           </div>
 
-          {selectedDay && (
+          {selectedDate && (
             <>
               <p className="text-center text-sm font-bold mb-2">Horários disponíveis:</p>
               <div className="grid grid-cols-4 gap-1 text-center text-black text-xs mb-4">
                 {["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"].map((hour, i) => (
                   <div
                     key={i}
-                    onClick={() => setSelectedHour(hour)}
+                    onClick={() => setSelectedTime(hour)}
                     className={`rounded-full py-1 px-2 cursor-pointer transition whitespace-nowrap text-white text-xs text-center ${
-                      selectedHour === hour ? 'bg-green-600' : 'bg-amber-500 hover:bg-amber-600'
+                      selectedTime === hour ? 'bg-green-600' : 'bg-amber-500 hover:bg-amber-600'
                     }`}
                   >
                     {hour}
                   </div>
                 ))}
               </div>
-              {selectedHour && (
+              {selectedTime && (
                 <button
                   onClick={handleFinalizar}
                   className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
@@ -328,7 +338,7 @@ export default function Home() {
       <div 
         className={`w-full max-w-sm h-[75vh] bg-[#1f1f29] rounded-3xl p-6 text-white flex flex-col`}
       >
-        {activeTab === "SERVIÇOS" && (
+        {activeTab === TAB_SERVICES && (
           <div className="flex justify-between items-center mb-6">
             <div>
               <p className="text-lg text-amber-500 font-semibold">Bem-vindo</p>
@@ -342,28 +352,31 @@ export default function Home() {
 
         <div className="flex justify-between bg-[#2a2a38] rounded-full p-1 mb-4">
           {[
-            "SERVIÇOS",
-            "BARBEIROS",
-            "CALENDÁRIO",
-            ...(canShowSummary ? ["RESUMO"] : [])
+            TAB_SERVICES,
+            TAB_BARBERS,
+            TAB_CALENDAR,
+            ...(canShowSummary ? [TAB_SUMMARY] : [])
           ].map(tab => (
             <button
               key={tab}
               onClick={() => {
-                if (tab === "BARBEIROS" && !hasSelected) return;
-                if (tab === "CALENDÁRIO" && !hasSelectedBarber) return;
+                if (tab === TAB_BARBERS && !hasSelected) return;
+                if (tab === TAB_CALENDAR && !hasSelectedBarber) return;
                 setActiveTab(tab);
               }}
               className={`flex-1 py-2 rounded-full text-xs font-bold ${
                 activeTab === tab ? 'bg-amber-500 text-black' : 'text-white'
               }`}
             >
-              {tab}
+              {tab === TAB_SERVICES ? 'SERVIÇOS' :
+               tab === TAB_BARBERS ? 'BARBEIROS' :
+               tab === TAB_CALENDAR ? 'CALENDÁRIO' :
+               'RESUMO'}
             </button>
           ))}
         </div>
 
-        {activeTab === "CALENDÁRIO" ? (
+        {activeTab === TAB_CALENDAR ? (
           <div className="flex-1">
             {renderContent()}
           </div>
@@ -375,4 +388,26 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+export default function Home() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // Se não estiver logado, redireciona para o login
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
+        <div className="text-white">Carregando...</div>
+      </div>
+    );
+  }
+
+  return <MainContent />;
 }
