@@ -305,7 +305,7 @@ export default function Home() {
               {selectedHour && (
                 <button
                   onClick={handleFinalizar}
-                  className="w-full font-bold text-sm py-3 rounded-full bg-green-600 text-white hover:bg-green-700 transition"
+                  className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
                 >
                   FINALIZAR
                 </button>
@@ -321,7 +321,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
-      <div className="w-full max-w-sm h-[80vh] bg-[#1f1f29] rounded-3xl p-6 text-white flex flex-col mx-auto">
+      <div className="w-full max-w-sm h-[70vh] bg-[#1f1f29] rounded-3xl p-6 text-white flex flex-col -mt-15">
         {showSummary ? (
           renderContent()
         ) : (
