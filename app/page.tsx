@@ -153,6 +153,7 @@ export default function Home() {
                 setSelectedDay(null);
                 setSelectedHour(null);
                 setActiveTab("SERVIÇOS");
+                window.location.href = '/confirmation';
               }}
               className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
             >
