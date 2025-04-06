@@ -78,8 +78,6 @@ export default function Home() {
 
   const canShowSummary = selectedDay && selectedHour;
 
-  const isSafari = typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
   const renderContent = () => {
     if (activeTab === "RESUMO") {
       return (
@@ -322,11 +320,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
-      <div 
-        className={`w-full max-w-sm bg-[#1f1f29] rounded-3xl p-6 text-white flex flex-col ${
-          isSafari ? 'h-[80vh] -mt-20' : 'h-[70vh] -mt-15'
-        }`}
-      >
+      <div className="w-full max-w-sm h-[80vh] bg-[#1f1f29] rounded-3xl p-6 text-white flex flex-col -mt-20">
         {showSummary ? (
           renderContent()
         ) : (
