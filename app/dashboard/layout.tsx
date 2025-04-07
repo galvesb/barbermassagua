@@ -8,7 +8,7 @@ import { Menu, X } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +45,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMenuOpen]);
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/');
+  };
 
   if (loading) {
     return <div className="text-white">Carregando...</div>;
@@ -120,6 +125,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   className="w-full text-left text-sm text-gray-400 hover:text-white transition-colors p-2"
                 >
                   Relatórios
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left text-sm text-red-500 hover:text-red-600 transition-colors p-2"
+                >
+                  Sair
                 </button>
               </div>
             </div>

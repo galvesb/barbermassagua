@@ -434,6 +434,33 @@ export default function Home() {
     if (!loading && !user) {
       router.push('/login');
     }
+
+    // Verifica se é admin e redireciona
+    if (!loading && user) {
+      const fetchUserRole = async () => {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Erro ao verificar perfil do usuário:', error);
+          return;
+        }
+
+        // Se for admin, redireciona para /dashboard
+        if (profile?.is_admin) {
+          router.push('/dashboard');
+        }
+        // Se não for admin, mantém na página inicial
+        else {
+          router.push('/');
+        }
+      };
+
+      fetchUserRole();
+    }
   }, [user, loading, router]);
 
   if (loading) {
