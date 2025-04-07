@@ -1,9 +1,21 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { CreditCard, PlusCircle } from "lucide-react";
 
 export default function DashboardPage() {
+  const router = useRouter();
+
+  const handleAddBarber = () => {
+    // TODO: Implement barber registration page
+    console.log('Adicionar barbeiro');
+  };
+
+  const handleAddService = () => {
+    router.push('/services');
+  };
+
   return (
     <div className="space-y-6">
 
@@ -31,7 +43,10 @@ export default function DashboardPage() {
       <div className="bg-[#2a2a38] p-4 rounded-xl">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-sm">Barbeiros</h3>
-          <button className="text-amber-500 text-sm font-medium flex items-center">
+          <button 
+            onClick={handleAddBarber}
+            className="text-amber-500 text-sm font-medium flex items-center hover:text-amber-600"
+          >
             <PlusCircle className="w-4 h-4 mr-1" /> Adicionar
           </button>
         </div>
@@ -58,7 +73,10 @@ export default function DashboardPage() {
       <div className="bg-[#2a2a38] p-4 rounded-xl">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-sm">Serviços</h3>
-          <button className="text-amber-500 text-sm font-medium flex items-center">
+          <button 
+            onClick={handleAddService}
+            className="text-amber-500 text-sm font-medium flex items-center hover:text-amber-600"
+          >
             <PlusCircle className="w-4 h-4 mr-1" /> Adicionar
           </button>
         </div>
