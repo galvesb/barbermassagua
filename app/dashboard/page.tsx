@@ -6,8 +6,6 @@ import { CreditCard, PlusCircle } from "lucide-react";
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
-      {/* Título */}
-      <h1 className="text-xl font-bold text-amber-500">Dashboard</h1>
 
       {/* Métricas rápidas */}
       <div className="grid grid-cols-2 gap-4">
