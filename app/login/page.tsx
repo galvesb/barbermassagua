@@ -19,7 +19,7 @@ export default function Login() {
 
     try {
       await signIn(email, password);
-      router.push('/');
+      router.push('/loading'); // Redireciona para a tela de carregamento
     } catch (error) {
       setError(error.message || 'Erro ao fazer login');
     }
