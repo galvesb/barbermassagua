@@ -21,6 +21,7 @@ export default function Services() {
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchServices();
@@ -93,6 +94,16 @@ export default function Services() {
           <p className="text-gray-400">Lista de serviços disponíveis</p>
         </div>
 
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Buscar serviço..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-[#3a3a48] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+          />
+        </div>
+
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-1">
             <div className="flex items-center justify-between bg-[#3a3a48] p-2.5 border-b border-[#4a4a58]">
@@ -110,7 +121,7 @@ export default function Services() {
               </div>
             </div>
 
-            {services.map((service, index) => (
+            {services.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase())).map((service, index) => (
               <div 
                 key={service.id}
                 className={`flex items-center justify-between ${
