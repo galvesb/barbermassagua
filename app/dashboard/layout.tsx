@@ -92,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </button>
                 <button
                   onClick={() => {
-                    router.push('/dashboard/services');
+                    router.push('/services/list');
                     setIsMenuOpen(false);
                   }}
                   className="w-full text-left text-sm text-gray-400 hover:text-white transition-colors p-2"
