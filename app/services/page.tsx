@@ -140,27 +140,28 @@ export default function Services() {
                 placeholder="R$ 0,00"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
                 required
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
             </div>
           </div>
 
           <div>
             <label htmlFor="serviceDuration" className="block text-sm font-medium text-gray-300 mb-2">
-              Duração do Serviço (em minutos)
+              Duração (minutos)
             </label>
-            <div className="relative">
-              <input
-                type="number"
-                id="serviceDuration"
-                value={serviceDuration}
-                onChange={(e) => setServiceDuration(e.target.value)}
-                placeholder="Ex: 30 para 30 minutos, 60 para 1 hora"
-                className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
-                required
-                min="1"
-                step="1"
-              />
-            </div>
+            <input
+              type="number"
+              id="serviceDuration"
+              value={serviceDuration}
+              onChange={(e) => setServiceDuration(e.target.value)}
+              placeholder="Duração em minutos"
+              className="w-full pl-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+              required
+              min="1"
+              inputMode="numeric"
+              pattern="[0-9]*"
+            />
           </div>
 
           <div>
