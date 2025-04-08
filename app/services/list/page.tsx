@@ -96,7 +96,7 @@ export default function Services() {
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-1">
             <div className="flex items-center justify-between bg-[#3a3a48] p-2.5 border-b border-[#4a4a58]">
-              <div className="flex-1 text-center">
+              <div className="w-1/6 text-center">
                 <p className="text-sm font-medium">Icone</p>
               </div>
               <div className="flex-1 text-center">
@@ -105,10 +105,7 @@ export default function Services() {
               <div className="flex-1 text-center">
                 <p className="text-sm font-medium">Preço</p>
               </div>
-              <div className="w-1/4 text-center">
-                <p className="text-sm font-medium">Duração</p>
-              </div>
-              <div className="w-1/4 text-center">
+              <div className="flex-1 text-center">
                 <p className="text-sm font-medium">Ações</p>
               </div>
             </div>
@@ -120,7 +117,7 @@ export default function Services() {
                   index % 2 === 0 ? 'bg-[#2a2a38]' : 'bg-[#3a3a48]'
                 } p-2.5 border-b border-[#4a4a58]`}
               >
-                <div className="flex-1 flex items-center justify-center">
+                <div className="w-1/6 flex items-center justify-center">
                   <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center">
                     {service.icon === 'Scissors' && <Scissors className="text-amber-500" size={18} />}
                     {service.icon === 'SprayCan' && <SprayCan className="text-amber-500" size={18} />}
@@ -135,10 +132,7 @@ export default function Services() {
                 <div className="flex-1 text-center">
                   <p className="text-sm text-amber-500 font-medium">R${service.price}</p>
                 </div>
-                <div className="w-1/4 text-center">
-                  <p className="text-sm font-medium">{service.duration} min</p>
-                </div>
-                <div className="w-1/4 flex justify-center gap-2">
+                <div className="flex-1 flex justify-center gap-2">
                   <button 
                     onClick={() => router.push(`/services/edit/${service.id}`)}
                     className="p-2 rounded-full bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
