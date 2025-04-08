@@ -83,27 +83,46 @@ export default function Services() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="space-y-3">
-            {services.map((service) => (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between bg-[#3a3a48] p-2.5 border-b border-[#4a4a58]">
+              <div className="flex-1 text-center">
+                <p className="text-sm font-medium">Icone</p>
+              </div>
+              <div className="flex-1 text-center">
+                <p className="text-sm font-medium">Nome</p>
+              </div>
+              <div className="flex-1 text-center">
+                <p className="text-sm font-medium">Preço</p>
+              </div>
+              <div className="w-1/4 text-center">
+                <p className="text-sm font-medium">Duração</p>
+              </div>
+            </div>
+
+            {services.map((service, index) => (
               <div 
                 key={service.id}
-                className="bg-[#2a2a38] rounded-lg p-3 flex items-center justify-between"
+                className={`flex items-center justify-between ${
+                  index % 2 === 0 ? 'bg-[#2a2a38]' : 'bg-[#3a3a48]'
+                } p-2.5 border-b border-[#4a4a58]`}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
-                    {service.icon === 'Scissors' && <Scissors className="text-amber-500" size={20} />}
-                    {service.icon === 'SprayCan' && <SprayCan className="text-amber-500" size={20} />}
-                    {service.icon === 'Brush' && <Brush className="text-amber-500" size={20} />}
-                    {service.icon === 'Bath' && <Bath className="text-amber-500" size={20} />}
-                    {service.icon === 'Wand2' && <Wand2 className="text-amber-500" size={20} />}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{service.name}</p>
-                    <p className="text-xs text-gray-400">{service.description}</p>
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center">
+                    {service.icon === 'Scissors' && <Scissors className="text-amber-500" size={18} />}
+                    {service.icon === 'SprayCan' && <SprayCan className="text-amber-500" size={18} />}
+                    {service.icon === 'Brush' && <Brush className="text-amber-500" size={18} />}
+                    {service.icon === 'Bath' && <Bath className="text-amber-500" size={18} />}
+                    {service.icon === 'Wand2' && <Wand2 className="text-amber-500" size={18} />}
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="flex-1 text-center">
+                  <p className="text-sm font-medium">{service.name}</p>
+                </div>
+                <div className="flex-1 text-center">
                   <p className="text-sm text-amber-500 font-medium">R${service.price}</p>
+                </div>
+                <div className="w-1/4 text-center">
+                  <p className="text-sm font-medium">{service.duration} min</p>
                 </div>
               </div>
             ))}
