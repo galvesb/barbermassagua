@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabaseClient';
 
 const initialServices = [
   { name: "Corte de Cabelo", price: "R$40,00", value: 40, icon: <Scissors />, selected: false },
-  { name: "Barbear", price: "R$25,00", value: 25, icon: <SprayCan />, selected: false },
+  { name: "Barbear", price: "R$25,30", value: 25.30, icon: <SprayCan />, selected: false },
   { name: "Cuidado com a Barba", price: "R$30,00", value: 30, icon: <User />, selected: false },
   { name: "Estilo de Cabelo", price: "R$45,00", value: 45, icon: <Brush />, selected: false },
   { name: "Limpeza Facial", price: "R$50,00", value: 50, icon: <Smile />, selected: false },
@@ -371,8 +371,17 @@ function MainContent() {
             <div className="flex flex-col items-end space-y-2">
               <button
                 onClick={async () => {
-                  await supabase.auth.signOut();
-                  window.location.href = '/login';
+                  try {
+                    // Sign out from Supabase
+                    await supabase.auth.signOut();
+                    // Clear any local storage if needed
+                    localStorage.removeItem('supabase.auth.token');
+                    // Redirect to login page
+                    window.location.href = '/login';
+                  } catch (error) {
+                    console.error('Error during logout:', error);
+                    window.location.href = '/login';
+                  }
                 }}
                 className="p-1.5 bg-transparent hover:bg-red-500 hover:text-white rounded-full transition-colors duration-200"
               >
