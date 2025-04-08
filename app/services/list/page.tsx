@@ -145,8 +145,8 @@ export default function Services() {
                 </div>
                 <div className="flex-1 flex justify-center gap-2">
                   <button 
-                    onClick={() => router.push(`/services/edit/${service.id}`)}
-                    className="p-2 rounded-full bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                    onClick={() => router.push(`/services?id=${service.id}`)}
+                    className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
                   >
                     <Pencil className="text-amber-500" size={16} />
                   </button>

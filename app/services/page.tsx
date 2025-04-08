@@ -1,14 +1,14 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { PlusCircle, X, CheckCircle, Scissors, SprayCan, Brush, Bath, Wand2 } from 'lucide-react';
 import { useAuth } from '../../lib/useAuth';
 import { supabase } from '../../lib/supabaseClient';
-import InputMask from 'react-input-mask';
 
 export default function Services() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const [serviceName, setServiceName] = useState('');
   const [servicePrice, setServicePrice] = useState('');
@@ -17,6 +17,44 @@ export default function Services() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [serviceData, setServiceData] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Check if we're in edit mode
+  useEffect(() => {
+    const id = searchParams.get('id');
+    if (id) {
+      setIsEditing(true);
+      fetchService(id);
+    }
+  }, [searchParams]);
+
+  // Fetch service data for editing
+  const fetchService = async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      
+      setServiceData(data);
+      setServiceName(data.name);
+      setServicePrice(`R$ ${data.price.toFixed(2).replace('.', ',')}`);
+      
+      // Convert minutes to HH:MM format
+      const hours = Math.floor(data.duration_minutes / 60);
+      const minutes = data.duration_minutes % 60;
+      setServiceDuration(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
+      
+      setSelectedIcon(data.icon);
+    } catch (err) {
+      console.error('Error fetching service:', err);
+      router.push('/services/list');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,32 +79,51 @@ export default function Services() {
         throw new Error('Por favor, insira um valor válido para a duração');
       }
 
-      const { data, error: insertError } = await supabase
-        .from('services')
-        .insert([
-          {
+      if (isEditing) {
+        // Update existing service
+        if (!serviceData) throw new Error('Serviço não encontrado');
+        
+        const { error: updateError } = await supabase
+          .from('services')
+          .update({
             name: serviceName,
             price: priceValue,
             duration_minutes: durationValue[0] * 60 + durationValue[1],
-            created_by: user.id,
             icon: selectedIcon
-          }
-        ])
-        .select();
+          })
+          .eq('id', serviceData.id);
 
-      if (insertError) throw insertError;
+        if (updateError) throw updateError;
+      } else {
+        // Create new service
+        const { data, error: insertError } = await supabase
+          .from('services')
+          .insert([
+            {
+              name: serviceName,
+              price: priceValue,
+              duration_minutes: durationValue[0] * 60 + durationValue[1],
+              created_by: user.id,
+              icon: selectedIcon
+            }
+          ])
+          .select();
+
+        if (insertError) throw insertError;
+      }
 
       setSuccess(true);
       setServiceName('');
       setServicePrice('');
       setServiceDuration('');
+      setSelectedIcon('Scissors');
       
       // Reset form after 2 seconds
       setTimeout(() => {
         router.push('/services/list');
-      }, 2000);
+      }, 500);
     } catch (error) {
-      setError(error.message || 'Erro ao cadastrar serviço');
+      setError(error.message || (isEditing ? 'Erro ao atualizar serviço' : 'Erro ao cadastrar serviço'));
     } finally {
       setLoading(false);
     }
@@ -79,12 +136,15 @@ export default function Services() {
           {success ? (
             <div className="flex flex-col items-center">
               <CheckCircle className="text-green-500 w-8 h-8 mb-2" />
-              <p className="text-sm text-green-400 font-semibold">Serviço cadastrado com sucesso!</p>
+              <p className="text-sm text-green-400 font-semibold">
+                {isEditing ? 'Serviço atualizado com sucesso!' : 'Serviço cadastrado com sucesso!'}</p>
             </div>
           ) : (
             <div className="flex flex-col items-center">
-              <p className="text-sm text-amber-500 font-semibold">Novo Serviço</p>
-              <h1 className="text-base font-bold">Cadastro de Serviço</h1>
+              <p className="text-sm text-amber-500 font-semibold">
+                {isEditing ? 'Editar Serviço' : 'Novo Serviço'}</p>
+              <h1 className="text-base font-bold">
+                {isEditing ? 'Atualizar Serviço' : 'Cadastro de Serviço'}</h1>
             </div>
           )}
         </div>
@@ -131,7 +191,7 @@ export default function Services() {
                   }
 
                   // Remove all non-numeric characters except comma
-                  const numbersOnly = cleanValue.replace(/[\D]/g, '');
+                  const numbersOnly = cleanValue.replace(/[^0-9]/g, '');
                   
                   if (numbersOnly.length > 0) {
                     // Format the number from right to left
@@ -151,6 +211,14 @@ export default function Services() {
                     setServicePrice(`R$ ${formatted}`);
                   } else {
                     setServicePrice('');
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Backspace' || e.key === 'Delete') {
+                    return;
+                  }
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
                   }
                 }}
                 placeholder="R$ 0,00"
@@ -174,7 +242,7 @@ export default function Services() {
                 const cleanValue = value.replace('min', '').trim();
                 
                 // Remove all non-numeric characters
-                const numbersOnly = cleanValue.replace(/[\D]/g, '');
+                const numbersOnly = cleanValue.replace(/[^0-9]/g, '');
                 
                 // Handle backspace or deletion
                 if (value.length < serviceDuration.length) {
@@ -218,6 +286,14 @@ export default function Services() {
                   setServiceDuration(formatted);
                 } else {
                   setServiceDuration('');
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                  return;
+                }
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault();
                 }
               }}
               placeholder="0:00"
@@ -295,7 +371,7 @@ export default function Services() {
               loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-amber-600'
             }`}
           >
-            {loading ? 'Cadastrando...' : 'Cadastrar Serviço'}
+            {loading ? (isEditing ? 'Atualizando...' : 'Cadastrando...') : isEditing ? 'Atualizar Serviço' : 'Cadastrar Serviço'}
           </button>
         </form>
       </div>
