@@ -74,17 +74,18 @@ export default function Services() {
   return (
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
       <div className={`fixed inset-0 bg-[#1f1f29] p-8 text-white flex flex-col sm:max-w-sm sm:h-[75vh] sm:rounded-3xl sm:fixed sm:inset-0 sm:mx-auto sm:my-auto md:rounded-3xl`}>
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <p className="text-lg text-amber-500 font-semibold">Novo Serviço</p>
-            <h1 className="text-xl font-bold">Cadastro de Serviço</h1>
-          </div>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="p-1.5 bg-transparent hover:bg-red-500 hover:text-white rounded-full transition-colors duration-200"
-          >
-            <X className="text-red-500" size={18} />
-          </button>
+        <div className="flex flex-col items-center mb-6">
+          {success ? (
+            <div className="flex flex-col items-center">
+              <CheckCircle className="text-green-500 w-8 h-8 mb-2" />
+              <p className="text-sm text-green-400 font-semibold">Serviço cadastrado com sucesso!</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center">
+              <p className="text-sm text-amber-500 font-semibold">Novo Serviço</p>
+              <h1 className="text-base font-bold">Cadastro de Serviço</h1>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -93,13 +94,7 @@ export default function Services() {
           </div>
         )}
 
-        {success && (
-          <div className="bg-green-600/10 p-3 rounded-lg mb-6 text-green-400 text-center">
-            Serviço cadastrado com sucesso!
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 flex-1">
           <div>
             <label htmlFor="serviceName" className="block text-sm font-medium text-gray-300 mb-2">
               Nome do Serviço
@@ -160,30 +155,35 @@ export default function Services() {
             </label>
             <div className="flex space-x-4">
               <button
+                type="button"
                 onClick={() => setSelectedIcon('Scissors')}
                 className={`p-3 rounded-lg transition-colors ${selectedIcon === 'Scissors' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
               >
                 <Scissors size={24} className="text-white" />
               </button>
               <button
+                type="button"
                 onClick={() => setSelectedIcon('SprayCan')}
                 className={`p-3 rounded-lg transition-colors ${selectedIcon === 'SprayCan' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
               >
                 <SprayCan size={24} className="text-white" />
               </button>
               <button
+                type="button"
                 onClick={() => setSelectedIcon('Brush')}
                 className={`p-3 rounded-lg transition-colors ${selectedIcon === 'Brush' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
               >
                 <Brush size={24} className="text-white" />
               </button>
               <button
+                type="button"
                 onClick={() => setSelectedIcon('Bath')}
                 className={`p-3 rounded-lg transition-colors ${selectedIcon === 'Bath' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
               >
                 <Bath size={24} className="text-white" />
               </button>
               <button
+                type="button"
                 onClick={() => setSelectedIcon('Wand2')}
                 className={`p-3 rounded-lg transition-colors ${selectedIcon === 'Wand2' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
               >
