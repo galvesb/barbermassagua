@@ -100,18 +100,15 @@ export default function Services() {
             <label htmlFor="serviceName" className="block text-sm font-medium text-gray-300 mb-2">
               Nome do Serviço
             </label>
-            <div className="relative">
-              <PlusCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                id="serviceName"
-                value={serviceName}
-                onChange={(e) => setServiceName(e.target.value)}
-                placeholder="Digite o nome do serviço"
-                className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
-                required
-              />
-            </div>
+            <input
+              type="text"
+              id="serviceName"
+              value={serviceName}
+              onChange={(e) => setServiceName(e.target.value)}
+              placeholder="Nome do serviço"
+              className="w-full pl-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+              required
+            />
           </div>
 
           <div>
