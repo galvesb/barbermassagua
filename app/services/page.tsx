@@ -228,6 +228,25 @@ export default function Services() {
               inputMode="numeric"
               pattern="[0-9]*"
             />
+            
+            {serviceDuration && (
+              <p className="text-xs text-gray-400 mt-1">
+                {(() => {
+                  const [hours, minutes] = serviceDuration.split(':');
+                  const hoursNum = parseInt(hours) || 0;
+                  const minutesNum = parseInt(minutes) || 0;
+                  
+                  if (hoursNum === 0 && minutesNum === 0) return '';
+                  
+                  if (hoursNum === 0) {
+                    return `${minutesNum} minuto${minutesNum !== 1 ? 's' : ''}`;
+                  } else if (minutesNum === 0) {
+                    return `${hoursNum} hora${hoursNum !== 1 ? 's' : ''}`;
+                  }
+                  return `${hoursNum} hora${hoursNum !== 1 ? 's' : ''} e ${minutesNum} minuto${minutesNum !== 1 ? 's' : ''}`;
+                })()}
+              </p>
+            )}
           </div>
 
           <div>
