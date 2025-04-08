@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Scissors, PlusCircle } from 'lucide-react';
+import { Scissors, PlusCircle, SprayCan, Brush, Bath, Wand2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function Services() {
@@ -76,17 +76,23 @@ export default function Services() {
           {services.map((service) => (
             <div 
               key={service.id}
-              className="bg-[#2a2a38] rounded-lg p-4 flex items-center justify-between"
+              className="bg-[#2a2a38] rounded-lg p-3 flex items-center justify-between"
             >
-              <div className="flex items-center gap-4">
-                <Scissors className="text-amber-500" size={20} />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
+                  {service.icon === 'Scissors' && <Scissors className="text-amber-500" size={20} />}
+                  {service.icon === 'SprayCan' && <SprayCan className="text-amber-500" size={20} />}
+                  {service.icon === 'Brush' && <Brush className="text-amber-500" size={20} />}
+                  {service.icon === 'Bath' && <Bath className="text-amber-500" size={20} />}
+                  {service.icon === 'Wand2' && <Wand2 className="text-amber-500" size={20} />}
+                </div>
                 <div>
-                  <p className="font-semibold">{service.name}</p>
-                  <p className="text-gray-400 text-sm">{service.description}</p>
+                  <p className="text-sm font-medium">{service.name}</p>
+                  <p className="text-xs text-gray-400">{service.description}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-amber-500 font-semibold">R${service.price}</p>
+                <p className="text-sm text-amber-500 font-medium">R${service.price}</p>
               </div>
             </div>
           ))}
