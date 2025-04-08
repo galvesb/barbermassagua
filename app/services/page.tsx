@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { PlusCircle, X, CheckCircle, Scissors, SprayCan, Brush, Bath, Wand2 } from 'lucide-react';
 import { useAuth } from '../../lib/useAuth';
 import { supabase } from '../../lib/supabaseClient';
+import InputMask from 'react-input-mask';
 
 export default function Services() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function Services() {
         throw new Error('Por favor, preencha todos os campos');
       }
 
-      const priceValue = parseFloat(servicePrice.replace('R$', '').replace(',', '.'));
+      const priceValue = parseFloat(servicePrice.replace('R$', '').replace('.', '').replace(',', '.'));
       if (isNaN(priceValue)) {
         throw new Error('Por favor, insira um valor válido para o preço');
       }
@@ -122,7 +123,23 @@ export default function Services() {
                 type="text"
                 id="servicePrice"
                 value={servicePrice}
-                onChange={(e) => setServicePrice(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Remove R$ if present
+                  const cleanValue = value.replace('R$', '').trim();
+                  // Allow numbers, dots, and commas
+                  let formatted = cleanValue.replace(/[^\d.,]/g, '');
+                  
+                  // Split by comma and limit decimal places to 2
+                  const parts = formatted.split(',');
+                  if (parts.length > 1) {
+                    // Keep only first 2 decimal places
+                    parts[1] = parts[1].slice(0, 2);
+                    formatted = parts.join(',');
+                  }
+                  
+                  setServicePrice(`R$ ${formatted}`);
+                }}
                 placeholder="R$ 0,00"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
                 required
