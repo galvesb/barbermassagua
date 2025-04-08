@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Scissors, PlusCircle, SprayCan, Brush, Bath, Wand2 } from 'lucide-react';
+import { Scissors, PlusCircle, SprayCan, Brush, Bath, Wand2, Pencil, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function Services() {
@@ -97,6 +97,9 @@ export default function Services() {
               <div className="w-1/4 text-center">
                 <p className="text-sm font-medium">Duração</p>
               </div>
+              <div className="w-1/4 text-center">
+                <p className="text-sm font-medium">Ações</p>
+              </div>
             </div>
 
             {services.map((service, index) => (
@@ -123,6 +126,36 @@ export default function Services() {
                 </div>
                 <div className="w-1/4 text-center">
                   <p className="text-sm font-medium">{service.duration} min</p>
+                </div>
+                <div className="w-1/4 flex justify-center gap-2">
+                  <button 
+                    onClick={() => router.push(`/services/edit/${service.id}`)}
+                    className="p-2 rounded-full bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                  >
+                    <Pencil className="text-amber-500" size={16} />
+                  </button>
+                  <button 
+                    onClick={async () => {
+                      if (confirm('Tem certeza que deseja excluir este serviço?')) {
+                        try {
+                          const { error } = await supabase
+                            .from('services')
+                            .delete()
+                            .eq('id', service.id);
+                          
+                          if (error) throw error;
+                          
+                          await fetchServices();
+                        } catch (err) {
+                          console.error('Erro ao excluir serviço:', err);
+                          alert('Erro ao excluir serviço. Tente novamente.');
+                        }
+                      }
+                    }}
+                    className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 transition-colors"
+                  >
+                    <Trash className="text-red-500" size={16} />
+                  </button>
                 </div>
               </div>
             ))}
