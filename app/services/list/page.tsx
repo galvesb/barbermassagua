@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Scissors, PlusCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Services() {
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     fetchServices();
@@ -91,7 +93,7 @@ export default function Services() {
         </div>
 
         <button 
-          onClick={() => {}}
+          onClick={() => router.push('/services')}
           className="w-full bg-amber-500 text-black py-3 rounded-lg font-bold text-sm transition-colors hover:bg-amber-600 mt-6"
         >
           <PlusCircle className="w-4 h-4 mr-2 inline-block" /> Adicionar serviço

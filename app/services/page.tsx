@@ -63,7 +63,7 @@ export default function Services() {
       
       // Reset form after 2 seconds
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/services/list');
       }, 2000);
     } catch (error) {
       setError(error.message || 'Erro ao cadastrar serviço');
