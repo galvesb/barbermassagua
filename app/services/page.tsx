@@ -11,9 +11,7 @@ export default function Services() {
   const { user } = useAuth();
   const [serviceName, setServiceName] = useState('');
   const [servicePrice, setServicePrice] = useState('');
-  const [serviceIcon, setServiceIcon] = useState('');
-  const [serviceHours, setServiceHours] = useState('0');
-  const [serviceMinutes, setServiceMinutes] = useState('0');
+  const [serviceDuration, setServiceDuration] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,7 +25,7 @@ export default function Services() {
     try {
       if (!user) throw new Error('Usuário não autenticado');
       
-      if (!serviceName.trim() || !servicePrice.trim()) {
+      if (!serviceName.trim() || !servicePrice.trim() || !serviceDuration.trim()) {
         throw new Error('Por favor, preencha todos os campos');
       }
 
@@ -36,27 +34,29 @@ export default function Services() {
         throw new Error('Por favor, insira um valor válido para o preço');
       }
 
-      const { error: insertError } = await supabase
+      const durationValue = Math.floor(parseInt(serviceDuration));
+      if (isNaN(durationValue) || durationValue <= 0) {
+        throw new Error('Por favor, insira um valor válido para a duração');
+      }
+
+      const { data, error: insertError } = await supabase
         .from('services')
         .insert([
           {
             name: serviceName,
             price: priceValue,
-            duration_hours: parseInt(serviceHours),
-            duration_minutes: parseInt(serviceMinutes),
-            icon: serviceIcon,
+            duration_minutes: durationValue,
             created_by: user.id
           }
-        ]);
+        ])
+        .select();
 
       if (insertError) throw insertError;
 
       setSuccess(true);
       setServiceName('');
       setServicePrice('');
-      setServiceIcon('');
-      setServiceHours('0');
-      setServiceMinutes('0');
+      setServiceDuration('');
       
       // Reset form after 2 seconds
       setTimeout(() => {
@@ -134,50 +134,21 @@ export default function Services() {
           </div>
 
           <div>
-            <label htmlFor="serviceIcon" className="block text-sm font-medium text-gray-300 mb-2">
-              Ícone (opcional)
+            <label htmlFor="serviceDuration" className="block text-sm font-medium text-gray-300 mb-2">
+              Duração do Serviço (em minutos)
             </label>
             <div className="relative">
               <input
-                type="text"
-                id="serviceIcon"
-                value={serviceIcon}
-                onChange={(e) => setServiceIcon(e.target.value)}
-                placeholder="Ex: Scissors"
+                type="number"
+                id="serviceDuration"
+                value={serviceDuration}
+                onChange={(e) => setServiceDuration(e.target.value)}
+                placeholder="Ex: 30 para 30 minutos, 60 para 1 hora"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
+                required
+                min="1"
+                step="1"
               />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Duração do Serviço
-            </label>
-            <div className="flex gap-2">
-              <div className="relative w-1/2">
-                <select
-                  value={serviceHours}
-                  onChange={(e) => setServiceHours(e.target.value)}
-                  className="w-full pl-4 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
-                >
-                  <option value="0">0h</option>
-                  <option value="1">1h</option>
-                  <option value="2">2h</option>
-                  <option value="3">3h</option>
-                </select>
-              </div>
-              <div className="relative w-1/2">
-                <select
-                  value={serviceMinutes}
-                  onChange={(e) => setServiceMinutes(e.target.value)}
-                  className="w-full pl-4 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
-                >
-                  <option value="0">00min</option>
-                  <option value="15">15min</option>
-                  <option value="30">30min</option>
-                  <option value="45">45min</option>
-                </select>
-              </div>
             </div>
           </div>
 
