@@ -117,25 +117,41 @@ export default function Services() {
             </label>
             <div className="relative">
               <input
-                type="text"
+                type="tel"
                 id="servicePrice"
                 value={servicePrice}
                 onChange={(e) => {
                   const value = e.target.value;
                   // Remove R$ if present
                   const cleanValue = value.replace('R$', '').trim();
-                  // Allow numbers, dots, and commas
-                  let formatted = cleanValue.replace(/[^\d.,]/g, '');
                   
-                  // Split by comma and limit decimal places to 2
-                  const parts = formatted.split(',');
-                  if (parts.length > 1) {
-                    // Keep only first 2 decimal places
-                    parts[1] = parts[1].slice(0, 2);
-                    formatted = parts.join(',');
+                  if (cleanValue === '') {
+                    setServicePrice('');
+                    return;
                   }
+
+                  // Remove all non-numeric characters
+                  const numbersOnly = cleanValue.replace(/[^\d]/g, '');
                   
-                  setServicePrice(`R$ ${formatted}`);
+                  if (numbersOnly.length > 0) {
+                    // Format the number from right to left
+                    // First, add decimal point for cents
+                    let formatted = numbersOnly.slice(0, -2) + ',' + numbersOnly.slice(-2);
+                    
+                    // Add thousands separator if needed
+                    if (formatted.includes(',')) {
+                      const parts = formatted.split(',');
+                      const integerPart = parts[0];
+                      if (integerPart.length > 3) {
+                        const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                        formatted = formattedInteger + ',' + parts[1];
+                      }
+                    }
+                    
+                    setServicePrice(`R$ ${formatted}`);
+                  } else {
+                    setServicePrice('');
+                  }
                 }}
                 placeholder="R$ 0,00"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
