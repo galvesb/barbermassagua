@@ -1,9 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { Scissors, PlusCircle, SprayCan, Brush, Bath, Wand2, Pencil, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
+// Supabase client configuration
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+  {
+    auth: {
+      persistSession: true,
+    },
+  }
+);
 
 export default function Services() {
   const router = useRouter();
