@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { PlusCircle, X, CheckCircle } from 'lucide-react';
+import { PlusCircle, X, CheckCircle, Scissors, SprayCan, Brush, Bath, Wand2 } from 'lucide-react';
 import { useAuth } from '../../lib/useAuth';
 import { supabase } from '../../lib/supabaseClient';
 
@@ -12,6 +12,7 @@ export default function Services() {
   const [serviceName, setServiceName] = useState('');
   const [servicePrice, setServicePrice] = useState('');
   const [serviceDuration, setServiceDuration] = useState('');
+  const [selectedIcon, setSelectedIcon] = useState('Scissors');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -46,7 +47,8 @@ export default function Services() {
             name: serviceName,
             price: priceValue,
             duration_minutes: durationValue,
-            created_by: user.id
+            created_by: user.id,
+            icon: selectedIcon
           }
         ])
         .select();
@@ -149,6 +151,44 @@ export default function Services() {
                 min="1"
                 step="1"
               />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="serviceIcon" className="block text-sm font-medium text-gray-300 mb-2">
+              Ícone do Serviço
+            </label>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setSelectedIcon('Scissors')}
+                className={`p-3 rounded-lg transition-colors ${selectedIcon === 'Scissors' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
+              >
+                <Scissors size={24} className="text-white" />
+              </button>
+              <button
+                onClick={() => setSelectedIcon('SprayCan')}
+                className={`p-3 rounded-lg transition-colors ${selectedIcon === 'SprayCan' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
+              >
+                <SprayCan size={24} className="text-white" />
+              </button>
+              <button
+                onClick={() => setSelectedIcon('Brush')}
+                className={`p-3 rounded-lg transition-colors ${selectedIcon === 'Brush' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
+              >
+                <Brush size={24} className="text-white" />
+              </button>
+              <button
+                onClick={() => setSelectedIcon('Bath')}
+                className={`p-3 rounded-lg transition-colors ${selectedIcon === 'Bath' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
+              >
+                <Bath size={24} className="text-white" />
+              </button>
+              <button
+                onClick={() => setSelectedIcon('Wand2')}
+                className={`p-3 rounded-lg transition-colors ${selectedIcon === 'Wand2' ? 'bg-amber-500' : 'hover:bg-amber-500/20'}`}
+              >
+                <Wand2 size={24} className="text-white" />
+              </button>
             </div>
           </div>
 
