@@ -117,7 +117,7 @@ export default function Services() {
             </label>
             <div className="relative">
               <input
-                type="tel"
+                type="text"
                 id="servicePrice"
                 value={servicePrice}
                 onChange={(e) => {
@@ -130,8 +130,8 @@ export default function Services() {
                     return;
                   }
 
-                  // Remove all non-numeric characters
-                  const numbersOnly = cleanValue.replace(/[^\d]/g, '');
+                  // Remove all non-numeric characters except comma
+                  const numbersOnly = cleanValue.replace(/[\D]/g, '');
                   
                   if (numbersOnly.length > 0) {
                     // Format the number from right to left
@@ -156,8 +156,6 @@ export default function Services() {
                 placeholder="R$ 0,00"
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
                 required
-                inputMode="numeric"
-                pattern="[0-9]*"
               />
             </div>
           </div>
@@ -176,7 +174,7 @@ export default function Services() {
                 const cleanValue = value.replace('min', '').trim();
                 
                 // Remove all non-numeric characters
-                const numbersOnly = cleanValue.replace(/[^\d]/g, '');
+                const numbersOnly = cleanValue.replace(/[\D]/g, '');
                 
                 // Handle backspace or deletion
                 if (value.length < serviceDuration.length) {
@@ -225,8 +223,6 @@ export default function Services() {
               placeholder="0:00"
               className="w-full pl-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
               required
-              inputMode="numeric"
-              pattern="[0-9]*"
             />
             
             {serviceDuration && (
