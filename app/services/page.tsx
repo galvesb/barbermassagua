@@ -36,8 +36,8 @@ export default function Services() {
         throw new Error('Por favor, insira um valor válido para o preço');
       }
 
-      const durationValue = Math.floor(parseInt(serviceDuration));
-      if (isNaN(durationValue) || durationValue <= 0) {
+      const durationValue = serviceDuration.replace('min', '').split(':').map(Number);
+      if (isNaN(durationValue[0]) || isNaN(durationValue[1]) || durationValue[0] < 0 || durationValue[1] < 0 || durationValue[1] >= 60) {
         throw new Error('Por favor, insira um valor válido para a duração');
       }
 
@@ -47,7 +47,7 @@ export default function Services() {
           {
             name: serviceName,
             price: priceValue,
-            duration_minutes: durationValue,
+            duration_minutes: durationValue[0] * 60 + durationValue[1],
             created_by: user.id,
             icon: selectedIcon
           }
@@ -164,17 +164,67 @@ export default function Services() {
 
           <div>
             <label htmlFor="serviceDuration" className="block text-sm font-medium text-gray-300 mb-2">
-              Duração (minutos)
+              Duração do Serviço
             </label>
             <input
-              type="number"
+              type="tel"
               id="serviceDuration"
               value={serviceDuration}
-              onChange={(e) => setServiceDuration(e.target.value)}
-              placeholder="Duração em minutos"
+              onChange={(e) => {
+                const value = e.target.value;
+                // Remove "min" if present
+                const cleanValue = value.replace('min', '').trim();
+                
+                // Remove all non-numeric characters
+                const numbersOnly = cleanValue.replace(/[^\d]/g, '');
+                
+                // Handle backspace or deletion
+                if (value.length < serviceDuration.length) {
+                  if (numbersOnly.length <= 2) {
+                    setServiceDuration('');
+                    return;
+                  }
+                  
+                  // Remove last character and reformat
+                  const newNumbers = numbersOnly.slice(0, -1);
+                  let formatted = newNumbers;
+                  if (newNumbers.length > 2) {
+                    // Remove leading zeros from hours
+                    const hours = newNumbers.slice(0, -2).replace(/^0+/, '');
+                    formatted = hours + ':' + newNumbers.slice(-2);
+                  } else {
+                    formatted = '0:' + newNumbers.padStart(2, '0');
+                  }
+                  
+                  setServiceDuration(formatted);
+                  return;
+                }
+
+                // For regular input
+                if (cleanValue === '') {
+                  setServiceDuration('');
+                  return;
+                }
+
+                if (numbersOnly.length > 0) {
+                  // Format the number from right to left
+                  let formatted = numbersOnly;
+                  if (numbersOnly.length > 2) {
+                    // Remove leading zeros from hours
+                    const hours = numbersOnly.slice(0, -2).replace(/^0+/, '');
+                    formatted = hours + ':' + numbersOnly.slice(-2);
+                  } else {
+                    formatted = '0:' + numbersOnly.padStart(2, '0');
+                  }
+                  
+                  setServiceDuration(formatted);
+                } else {
+                  setServiceDuration('');
+                }
+              }}
+              placeholder="0:00"
               className="w-full pl-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
               required
-              min="1"
               inputMode="numeric"
               pattern="[0-9]*"
             />
