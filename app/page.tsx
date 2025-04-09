@@ -1,26 +1,16 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from "react";
-import { Menu, Scissors, CheckCircle, PlusCircle, SprayCan, User, Brush, ChevronLeft, ChevronRight, Wand2, Bath, Smile, ChevronUp, ChevronDown, X, Power } from "lucide-react";
+import { Menu, Scissors, SprayCan, CheckCircle, PlusCircle, Brush, ChevronLeft, ChevronRight, Wand2, Bath, Smile, ChevronUp, ChevronDown, X, Power } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/useAuth';
 import { supabase } from '../lib/supabaseClient';
 
-const initialServices = [
-  { name: "Corte de Cabelo", price: "R$40,00", value: 40, icon: <Scissors />, selected: false },
-  { name: "Barbear", price: "R$25,30", value: 25.30, icon: <SprayCan />, selected: false },
-  { name: "Cuidado com a Barba", price: "R$30,00", value: 30, icon: <User />, selected: false },
-  { name: "Estilo de Cabelo", price: "R$45,00", value: 45, icon: <Brush />, selected: false },
-  { name: "Limpeza Facial", price: "R$50,00", value: 50, icon: <Smile />, selected: false },
-  { name: "Massagem", price: "R$60,00", value: 60, icon: <Bath />, selected: false },
-  { name: "Finalização", price: "R$20,00", value: 20, icon: <Wand2 />, selected: false },
-];
-
 const initialBarbers = [
-  { name: "Guilherme Barros", role: "Especialista em cortes", icon: <User />, selected: false },
-  { name: "Marcos Silva", role: "Barbeiro tradicional", icon: <User />, selected: false },
-  { name: "João Souza", role: "Fade e navalhado", icon: <User />, selected: false },
-  { name: "Pedro Lima", role: "Designer de barba", icon: <User />, selected: false },
+  { name: "Guilherme Barros", role: "Especialista em cortes", icon: <Menu />, selected: false },
+  { name: "Marcos Silva", role: "Barbeiro tradicional", icon: <Menu />, selected: false },
+  { name: "João Souza", role: "Fade e navalhado", icon: <Menu />, selected: false },
+  { name: "Pedro Lima", role: "Designer de barba", icon: <Menu />, selected: false },
 ];
 
 function MainContent() {
@@ -32,7 +22,7 @@ function MainContent() {
 
   // Estados da aplicação
   const [activeTab, setActiveTab] = useState(TAB_SERVICES);
-  const [services, setServices] = useState(initialServices);
+  const [services, setServices] = useState([]);
   const [barbers, setBarbers] = useState(initialBarbers);
   const [total, setTotal] = useState(0);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -43,6 +33,62 @@ function MainContent() {
   const scrollRef = useRef(null);
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Função para buscar serviços do banco de dados
+  const fetchServices = async () => {
+    try {
+      const { data: servicesData, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedServices = servicesData.map(service => ({
+        name: service.name,
+        price: `R$${service.price.toFixed(2).replace('.', ',')}`,
+        value: service.price,
+        icon: getIconForService(service.icon),
+        selected: false,
+        duration: service.duration
+      }));
+
+      setServices(formattedServices);
+    } catch (error) {
+      console.error('Erro ao buscar serviços:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Função auxiliar para obter ícone baseado no nome do ícone
+  const getIconForService = (iconName: string) => {
+    switch (iconName) {
+      case 'Scissors':
+        return <Scissors />;
+      case 'SprayCan':
+        return <SprayCan />;
+      case 'Brush':
+        return <Brush />;
+      case 'Bath':
+        return <Bath />;
+      case 'Wand2':
+        return <Wand2 />;
+      default:
+        return <Scissors />;
+    }
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  useEffect(() => {
+    const sum = services.reduce((acc, item) => item.selected ? acc + item.value : acc, 0);
+    setTotal(sum);
+    setHasSelected(services.some(service => service.selected));
+  }, [services]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -64,12 +110,6 @@ function MainContent() {
 
     fetchProfile();
   }, [user]);
-
-  useEffect(() => {
-    const sum = services.reduce((acc, item) => item.selected ? acc + item.value : acc, 0);
-    setTotal(sum);
-    setHasSelected(services.some(service => service.selected));
-  }, [services]);
 
   useEffect(() => {
     const body = document.body;
