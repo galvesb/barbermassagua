@@ -155,29 +155,13 @@ export default function Services() {
                   </div>
                   <div className="flex-1 flex justify-center gap-2">
                     <button 
-                      onClick={() => router.push(`/services?id=${service.id}`)}
+                      onClick={() => router.push(`/services?id=${service.id}`)} 
                       className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
                     >
                       <Pencil className="text-amber-500" size={16} />
                     </button>
                     <button 
-                      onClick={async () => {
-                        if (confirm('Tem certeza que deseja excluir este serviço?')) {
-                          try {
-                            const { error } = await supabase
-                              .from('services')
-                              .delete()
-                              .eq('id', service.id);
-                            
-                            if (error) throw error;
-                            
-                            await fetchServices();
-                          } catch (err) {
-                            console.error('Erro ao excluir serviço:', err);
-                            alert('Erro ao excluir serviço. Tente novamente.');
-                          }
-                        }
-                      }}
+                      onClick={() => router.push(`/services/delete?id=${service.id}`)}
                       className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 transition-colors"
                     >
                       <Trash className="text-red-500" size={16} />
