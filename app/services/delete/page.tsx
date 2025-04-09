@@ -15,6 +15,26 @@ export default function DeleteService() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  // Fetch service data
+  const fetchService = async () => {
+    try {
+      const id = searchParams.get('id');
+      if (!id) return;
+
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      setServiceData(data);
+    } catch (error) {
+      console.error('Error fetching service:', error);
+      setError('Erro ao carregar serviço');
+    }
+  };
+
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
@@ -49,6 +69,11 @@ export default function DeleteService() {
     }
   }, [user, router]);
 
+  // Fetch service data when search params change
+  useEffect(() => {
+    fetchService();
+  }, [searchParams]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
@@ -60,30 +85,6 @@ export default function DeleteService() {
   if (!user) {
     return null; // Should never happen due to useEffect redirect
   }
-
-  // Fetch service data
-  useEffect(() => {
-    const fetchService = async () => {
-      try {
-        const id = searchParams.get('id');
-        if (!id) return;
-
-        const { data, error } = await supabase
-          .from('services')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (error) throw error;
-        setServiceData(data);
-      } catch (error) {
-        console.error('Error fetching service:', error);
-        setError('Erro ao carregar serviço');
-      }
-    };
-
-    fetchService();
-  }, [searchParams]);
 
   const handleCancel = () => {
     router.push('/services/list');

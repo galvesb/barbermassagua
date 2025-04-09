@@ -20,6 +20,42 @@ export default function Services() {
   const [serviceData, setServiceData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  // Fetch service data for editing
+  const fetchService = async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      
+      setServiceData(data);
+      setServiceName(data.name);
+      setServicePrice(`R$ ${data.price.toFixed(2).replace('.', ',')}`);
+      
+      // Convert minutes to HH:MM format
+      const hours = Math.floor(data.duration_minutes / 60);
+      const minutes = data.duration_minutes % 60;
+      setServiceDuration(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
+      
+      setSelectedIcon(data.icon);
+    } catch (err) {
+      console.error('Error fetching service:', err);
+      router.push('/services/list');
+    }
+  };
+
+  // Check if we're in edit mode
+  useEffect(() => {
+    const id = searchParams?.get('id');
+    if (id) {
+      setIsEditing(true);
+      fetchService(id);
+    }
+  }, [searchParams]);
+
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
@@ -65,42 +101,6 @@ export default function Services() {
   if (!user) {
     return null; // Should never happen due to useEffect redirect
   }
-
-  // Check if we're in edit mode
-  useEffect(() => {
-    const id = searchParams.get('id');
-    if (id) {
-      setIsEditing(true);
-      fetchService(id);
-    }
-  }, [searchParams]);
-
-  // Fetch service data for editing
-  const fetchService = async (id) => {
-    try {
-      const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      
-      setServiceData(data);
-      setServiceName(data.name);
-      setServicePrice(`R$ ${data.price.toFixed(2).replace('.', ',')}`);
-      
-      // Convert minutes to HH:MM format
-      const hours = Math.floor(data.duration_minutes / 60);
-      const minutes = data.duration_minutes % 60;
-      setServiceDuration(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
-      
-      setSelectedIcon(data.icon);
-    } catch (err) {
-      console.error('Error fetching service:', err);
-      router.push('/services/list');
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
