@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { PlusCircle, X, CheckCircle, Scissors, SprayCan, Brush, Bath, Wand2 } from 'lucide-react';
+import { PlusCircle, X, CheckCircle, Scissors, SprayCan, Brush, Bath, Wand2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../lib/useAuth';
 import { supabase } from '../../lib/supabaseClient';
 
@@ -133,20 +133,32 @@ export default function Services() {
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
       <div className={`fixed inset-0 bg-[#1f1f29] p-8 text-white flex flex-col sm:max-w-sm sm:h-[75vh] sm:rounded-3xl sm:fixed sm:inset-0 sm:mx-auto sm:my-auto md:rounded-3xl`}>
         <div className="flex flex-col items-center mb-6">
-          {success ? (
-            <div className="flex flex-col items-center">
-              <CheckCircle className="text-green-500 w-8 h-8 mb-2" />
-              <p className="text-sm text-green-400 font-semibold">
-                {isEditing ? 'Serviço atualizado com sucesso!' : 'Serviço cadastrado com sucesso!'}</p>
+          <div className="flex w-full items-center mb-4">
+            <button 
+              onClick={() => router.push('/services/list')} 
+              className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-amber-500" />
+            </button>
+            <div className="flex-1 flex justify-center items-center">
+              <div className="flex flex-col items-center">
+                {success ? (
+                  <div className="flex flex-col items-center">
+                    <CheckCircle className="text-green-500 w-8 h-8 mb-2" />
+                    <p className="text-sm text-green-400 font-semibold">
+                      {isEditing ? 'Serviço atualizado com sucesso!' : 'Serviço cadastrado com sucesso!'}</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <p className="text-sm text-amber-500 font-semibold">
+                      {isEditing ? 'Editar Serviço' : 'Novo Serviço'}</p>
+                    <h1 className="text-base font-bold">
+                      {isEditing ? 'Atualizar Serviço' : 'Cadastro de Serviço'}</h1>
+                  </div>
+                )}
+              </div>
             </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <p className="text-sm text-amber-500 font-semibold">
-                {isEditing ? 'Editar Serviço' : 'Novo Serviço'}</p>
-              <h1 className="text-base font-bold">
-                {isEditing ? 'Atualizar Serviço' : 'Cadastro de Serviço'}</h1>
-            </div>
-          )}
+          </div>
         </div>
 
         {error && (
