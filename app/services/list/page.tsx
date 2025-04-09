@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../../lib/useAuth';
 import { createClient } from '@supabase/supabase-js';
 import { Scissors, PlusCircle, SprayCan, Brush, Bath, Wand2, Pencil, Trash, ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 // Supabase client configuration
 const supabase = createClient(
@@ -18,10 +19,45 @@ const supabase = createClient(
 
 export default function Services() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const [services, setServices] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingServices, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  // Check if user is admin
+  useEffect(() => {
+    if (user) {
+      const checkAdmin = async () => {
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single();
+
+          if (error) {
+            console.error('Erro ao verificar perfil:', error);
+            router.push('/');
+          } else if (!profile?.is_admin) {
+            router.push('/');
+          }
+        } catch (error) {
+          console.error('Erro ao verificar admin:', error);
+          router.push('/');
+        }
+      };
+
+      checkAdmin();
+    }
+  }, [user, router]);
 
   useEffect(() => {
     fetchServices();
@@ -48,6 +84,18 @@ export default function Services() {
   }
 
   if (loading) {
+    return (
+      <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
+        <div className="text-white">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Should never happen due to useEffect redirect
+  }
+
+  if (loadingServices) {
     return (
       <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
         <div className="fixed inset-0 bg-[#1f1f29] p-6 text-white flex flex-col sm:max-w-sm sm:h-[75vh] sm:rounded-3xl sm:fixed sm:inset-0 sm:mx-auto sm:my-auto md:rounded-3xl">

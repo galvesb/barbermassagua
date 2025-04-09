@@ -1,11 +1,60 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreditCard, PlusCircle } from "lucide-react";
+import { useAuth } from '../../lib/useAuth';
+import { supabase } from '../../lib/supabaseClient';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  // Check if user is admin
+  useEffect(() => {
+    if (user) {
+      const checkAdmin = async () => {
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single();
+
+          if (error) {
+            console.error('Erro ao verificar perfil:', error);
+            router.push('/');
+          } else if (!profile?.is_admin) {
+            router.push('/');
+          }
+        } catch (error) {
+          console.error('Erro ao verificar admin:', error);
+          router.push('/');
+        }
+      };
+
+      checkAdmin();
+    }
+  }, [user, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
+        <div className="text-white">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Should never happen due to useEffect redirect
+  }
 
   const handleAddBarber = () => {
     // TODO: Implement barber registration page

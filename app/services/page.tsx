@@ -9,7 +9,7 @@ import { supabase } from '../../lib/supabaseClient';
 export default function Services() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [serviceName, setServiceName] = useState('');
   const [servicePrice, setServicePrice] = useState('');
   const [serviceDuration, setServiceDuration] = useState('');
@@ -19,6 +19,52 @@ export default function Services() {
   const [loading, setLoading] = useState(false);
   const [serviceData, setServiceData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+
+  // Check if user is admin
+  useEffect(() => {
+    if (user) {
+      const checkAdmin = async () => {
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single();
+
+          if (error) {
+            console.error('Erro ao verificar perfil:', error);
+            router.push('/');
+          } else if (!profile?.is_admin) {
+            router.push('/');
+          }
+        } catch (error) {
+          console.error('Erro ao verificar admin:', error);
+          router.push('/');
+        }
+      };
+
+      checkAdmin();
+    }
+  }, [user, router]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
+        <div className="text-white">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Should never happen due to useEffect redirect
+  }
 
   // Check if we're in edit mode
   useEffect(() => {
