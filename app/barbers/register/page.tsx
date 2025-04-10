@@ -75,8 +75,19 @@ export default function RegisterBarber() {
       const email = `${barber.name.toLowerCase().replace(/[^a-z0-9]/g, '')}@barbermassagua.com`;
       const password = '123456';
 
+      // Criar um novo cliente do Supabase apenas para este registro
+      const tempSupabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+        {
+          auth: {
+            persistSession: false, // Não persistir sessão
+          },
+        }
+      );
+
       // Primeiro criar o usuário
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await tempSupabase.auth.signUp({
         email,
         password,
         options: {
@@ -89,11 +100,8 @@ export default function RegisterBarber() {
 
       if (authError) throw authError;
 
-      // 2. Aguardar a criação do usuário no auth
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // 3. Criar o perfil manualmente usando o mesmo ID do auth
-      const { error: profileError } = await supabase
+      // 2. Criar o perfil manualmente usando o mesmo ID do auth
+      const { error: profileError } = await tempSupabase
         .from('profiles')
         .insert([{
           id: authData.user.id, // Usando o mesmo ID do auth
@@ -108,8 +116,8 @@ export default function RegisterBarber() {
         throw profileError;
       }
 
-      // 4. Criar o registro no barbers usando o ID do perfil
-      const { data: barberData, error: barberError } = await supabase
+      // 3. Criar o registro no barbers usando o ID do perfil
+      const { data: barberData, error: barberError } = await tempSupabase
         .from('barbers')
         .insert([{
           profile_id: authData.user.id, // Usando o ID do perfil
@@ -120,33 +128,42 @@ export default function RegisterBarber() {
 
       if (barberError) throw barberError;
 
-      // 5. Criar os horários usando o ID do barbeiro retornado
+      // 4. Criar os horários usando o ID do barbeiro retornado
       if (barberData?.id) {
         const validSchedules = schedules
           .filter(s => s.is_active && s.start_time && s.end_time)
           .map(schedule => ({
-            barber_id: barberData.id, // Usando o ID retornado do barbers
+            barber_id: barberData.id,
             day_of_week: schedule.day,
             start_time: schedule.start_time,
             end_time: schedule.end_time,
             is_active: schedule.is_active
           }));
 
-        if (validSchedules.length > 0) {
-          const { error: scheduleError } = await supabase
-            .from('barber_schedules')
-            .insert(validSchedules);
+        const { error: scheduleError } = await tempSupabase
+          .from('barber_schedules')
+          .insert(validSchedules);
 
-          if (scheduleError) throw scheduleError;
-        }
+        if (scheduleError) throw scheduleError;
       }
 
-      // 6. Mostrar mensagem de sucesso com as credenciais
-      alert(`Barbeiro cadastrado com sucesso!\n\nEmail: ${email}\nSenha: 123456`);
-      router.push('/barbers');
+      // Limpar formulário após sucesso
+      setBarber({ name: '', phone: '' });
+      setSchedules([
+        { day: 0, start_time: '08:00', end_time: '18:00', is_active: false },
+        { day: 1, start_time: '08:00', end_time: '18:00', is_active: true },
+        { day: 2, start_time: '08:00', end_time: '18:00', is_active: false },
+        { day: 3, start_time: '08:00', end_time: '18:00', is_active: false },
+        { day: 4, start_time: '08:00', end_time: '18:00', is_active: false },
+        { day: 5, start_time: '08:00', end_time: '18:00', is_active: false },
+        { day: 6, start_time: '08:00', end_time: '18:00', is_active: false }
+      ]);
+
+      router.refresh();
+      router.push('/dashboard');
     } catch (error) {
-      console.error('Erro ao cadastrar:', error);
-      setError('Erro ao cadastrar barbeiro');
+      console.error('Erro ao cadastrar barbeiro:', error);
+      setError('Erro ao cadastrar barbeiro. Por favor, tente novamente.');
     } finally {
       setLoading(false);
     }
