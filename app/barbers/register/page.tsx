@@ -160,7 +160,7 @@ export default function RegisterBarber() {
       ]);
 
       router.refresh();
-      router.push('/dashboard');
+      router.push('/barbers/list');
     } catch (error) {
       console.error('Erro ao cadastrar barbeiro:', error);
       setError('Erro ao cadastrar barbeiro. Por favor, tente novamente.');
@@ -186,7 +186,7 @@ export default function RegisterBarber() {
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold">Cadastro de Barbeiro</h1>
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/barbers/list')}
               className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
             >
               <ArrowLeft className="text-amber-500" size={20} />
