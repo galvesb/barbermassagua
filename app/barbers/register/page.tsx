@@ -163,112 +163,116 @@ export default function RegisterBarber() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-[#1f1f29] p-6 text-white flex flex-col sm:max-w-sm sm:h-[75vh] sm:rounded-3xl sm:fixed sm:inset-0 sm:mx-auto sm:my-auto md:rounded-3xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Cadastro de Barbeiro</h1>
-          <button
-            onClick={() => router.push('/barbers')}
-            className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
-          >
-            <ArrowLeft className="text-amber-500" size={20} />
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col w-full h-[calc(100%-120px)] overflow-y-auto custom-scrollbar">
-            {error && (
-              <div className="mb-4 p-4 bg-red-500/20 rounded-lg text-red-500">
-                {error}
-              </div>
-            )}
-            
-            <div className="mb-6">
-              <input
-                type="text"
-                name="name"
-                placeholder="Nome do Barbeiro"
-                value={barber.name}
-                onChange={handleInputChange}
-                className="w-full bg-[#3a3a48] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                required
-              />
-            </div>
-
-            <div className="mb-6">
-              <input
-                type="text"
-                name="phone"
-                placeholder="Telefone"
-                value={barber.phone}
-                onChange={handleInputChange}
-                className="w-full bg-[#3a3a48] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-              />
-            </div>
-
-            <h2 className="text-xl font-bold mb-4">Horários de Atendimento</h2>
-            
-            <div className="space-y-3">
-              {schedules.map((schedule, index) => (
-                <div key={schedule.day} className="bg-[#3a3a48] p-3 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Clock className="text-amber-500" size={16} />
-                      <span className="font-medium">{daysOfWeek[index]}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={schedule.is_active}
-                        onChange={(e) => handleScheduleChange(schedule.day, 'is_active', e.target.checked)}
-                        className="w-4 h-4 text-amber-500 bg-gray-100 rounded border-gray-300 focus:ring-amber-500"
-                      />
-                      <span className="text-sm">Ativo</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="time"
-                      value={schedule.start_time}
-                      onChange={(e) => handleScheduleChange(schedule.day, 'start_time', e.target.value)}
-                      className="flex-1 bg-[#4a4a58] text-white rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                      placeholder="08:00"
-                    />
-                    <span className="text-gray-400">às</span>
-                    <input
-                      type="time"
-                      value={schedule.end_time}
-                      onChange={(e) => handleScheduleChange(schedule.day, 'end_time', e.target.value)}
-                      className="flex-1 bg-[#4a4a58] text-white rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                      placeholder="18:00"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
+    <div className="min-h-screen bg-[#2a2a38] flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#1f1f29] p-6 text-white flex flex-col sm:max-w-md sm:h-[80vh] sm:rounded-3xl sm:fixed sm:inset-0 sm:mx-auto sm:my-auto md:rounded-3xl">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold">Cadastro de Barbeiro</h1>
             <button
-              type="submit"
-              className="w-full bg-amber-500 text-black py-3 rounded-lg font-bold text-sm transition-colors hover:bg-amber-600 mt-6"
-              disabled={loading}
+              onClick={() => router.push('/barbers')}
+              className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
             >
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-900 mr-2"></div>
-                  <span>Cadastrando...</span>
-                </div>
-              ) : (
-                <>
-                  <PlusCircle className="w-4 h-4 mr-2 inline-block" /> Cadastrar Barbeiro
-                </>
-              )}
+              <ArrowLeft className="text-amber-500" size={20} />
             </button>
-          </form>
-        )}
+          </div>
+
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col w-full h-[calc(100%-120px)]">
+              <div className="flex-1 overflow-y-auto custom-scrollbar">
+                {error && (
+                  <div className="mb-4 p-4 bg-red-500/20 rounded-lg text-red-500">
+                    {error}
+                  </div>
+                )}
+                
+                <div className="mb-6">
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Nome do Barbeiro"
+                    value={barber.name}
+                    onChange={handleInputChange}
+                    className="w-full bg-[#3a3a48] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                    required
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <input
+                    type="text"
+                    name="phone"
+                    placeholder="Telefone"
+                    value={barber.phone}
+                    onChange={handleInputChange}
+                    className="w-full bg-[#3a3a48] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                  />
+                </div>
+
+                <h2 className="text-xl font-bold mb-4">Horários de Atendimento</h2>
+                
+                <div className="space-y-3">
+                  {schedules.map((schedule, index) => (
+                    <div key={schedule.day} className="bg-[#3a3a48] p-3 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Clock className="text-amber-500" size={16} />
+                          <span className="font-medium">{daysOfWeek[index]}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={schedule.is_active}
+                            onChange={(e) => handleScheduleChange(schedule.day, 'is_active', e.target.checked)}
+                            className="w-4 h-4 text-amber-500 bg-gray-100 rounded border-gray-300 focus:ring-amber-500"
+                          />
+                          <span className="text-sm">Ativo</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="time"
+                          value={schedule.start_time}
+                          onChange={(e) => handleScheduleChange(schedule.day, 'start_time', e.target.value)}
+                          className="flex-1 bg-[#4a4a58] text-white rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                          placeholder="08:00"
+                        />
+                        <span className="text-gray-400">às</span>
+                        <input
+                          type="time"
+                          value={schedule.end_time}
+                          onChange={(e) => handleScheduleChange(schedule.day, 'end_time', e.target.value)}
+                          className="flex-1 bg-[#4a4a58] text-white rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                          placeholder="18:00"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-amber-500 text-black py-3 rounded-lg font-bold text-sm transition-colors hover:bg-amber-600 mt-6"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-900 mr-2"></div>
+                    <span>Cadastrando...</span>
+                  </div>
+                ) : (
+                  <>
+                    <PlusCircle className="w-4 h-4 mr-2 inline-block" /> Cadastrar Barbeiro
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
