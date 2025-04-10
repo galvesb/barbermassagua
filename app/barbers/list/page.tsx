@@ -159,15 +159,16 @@ export default function BarbersList() {
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-[#1f1f29] p-6 text-white flex flex-col sm:max-w-sm sm:h-[80vh] sm:rounded-3xl sm:fixed sm:inset-0 sm:mx-auto sm:my-auto md:rounded-3xl">
         <div className="flex flex-col w-full space-y-4 h-[calc(100%-100px)]">
-          <div className="flex items-center justify-between mb-6">
-          <button
+          <div className="flex items-center mb-6">
+            <button
               onClick={() => router.push('/dashboard')}
               className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
             >
               <ArrowLeft className="text-amber-500" size={20} />
             </button>
-            <h1 className="text-3xl font-bold text-center">Barbeiros</h1>
-
+            <div className="flex-1 flex items-center justify-center">
+              <h1 className="text-3xl font-bold">Barbeiros</h1>
+            </div>
           </div>
 
           <div className="mb-6">
