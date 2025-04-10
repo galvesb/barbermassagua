@@ -27,13 +27,13 @@ export default function RegisterBarber() {
     phone: ''
   });
   const [schedules, setSchedules] = useState<any[]>([
-    { day: 0, start_time: '', end_time: '', is_active: true },
-    { day: 1, start_time: '', end_time: '', is_active: true },
-    { day: 2, start_time: '', end_time: '', is_active: true },
-    { day: 3, start_time: '', end_time: '', is_active: true },
-    { day: 4, start_time: '', end_time: '', is_active: true },
-    { day: 5, start_time: '', end_time: '', is_active: true },
-    { day: 6, start_time: '', end_time: '', is_active: true }
+    { day: 0, start_time: '08:00', end_time: '18:00', is_active: false },
+    { day: 1, start_time: '08:00', end_time: '18:00', is_active: true },
+    { day: 2, start_time: '08:00', end_time: '18:00', is_active: false },
+    { day: 3, start_time: '08:00', end_time: '18:00', is_active: false },
+    { day: 4, start_time: '08:00', end_time: '18:00', is_active: false },
+    { day: 5, start_time: '08:00', end_time: '18:00', is_active: false },
+    { day: 6, start_time: '08:00', end_time: '18:00', is_active: false }
   ]);
 
   // Redirect if not authenticated
