@@ -22,3 +22,28 @@
     font-size: 16px !important;
   }
 }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f1f29;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a4a58;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5a5a68;
+}
+
+/* Aplicar o estilo customizado ao componente */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4a4a58 #1f1f29;
+}
