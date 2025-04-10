@@ -136,7 +136,7 @@ export default function Services() {
 
   return (
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
-      <div className={`fixed inset-0 bg-[#1f1f29] p-8 text-white flex flex-col sm:max-w-sm sm:h-[75vh] sm:rounded-3xl sm:fixed sm:inset-0 sm:mx-auto sm:my-auto md:rounded-3xl`}>
+      <div className={`fixed inset-0 bg-[#1f1f29] p-8 text-white flex flex-col sm:max-w-sm sm:h-[90vh] sm:rounded-3xl sm:fixed sm:inset-0 sm:mx-auto sm:my-auto md:rounded-3xl md:h-[95vh] lg:h-[95vh]`}>
         <div className="flex flex-col items-center mb-6">
           <div className="flex w-full items-center mb-4">
             <button 
@@ -151,7 +151,7 @@ export default function Services() {
           </div>
         </div>
 
-        <div className="flex flex-col w-full space-y-4">
+        <div className="flex flex-col w-full space-y-4 h-[calc(100%-120px)]">
           <div className="mb-6">
             <input
               type="text"
@@ -164,7 +164,7 @@ export default function Services() {
 
           <div className="flex-1 overflow-y-auto">
             <div className="space-y-1">
-              <div className="flex items-center justify-between bg-[#3a3a48] p-2.5 border-b border-[#4a4a58]">
+              <div className="flex items-center justify-between bg-[#3a3a48] p-2.5 border-b border-[#4a4a58] sticky top-0 z-10">
                 <div className="w-1/6 text-center">
                   <p className="text-sm font-medium">Icone</p>
                 </div>
