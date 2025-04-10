@@ -169,7 +169,7 @@ export default function RegisterBarber() {
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold">Cadastro de Barbeiro</h1>
             <button
-              onClick={() => router.push('/barbers')}
+              onClick={() => router.push('/dashboard')}
               className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
             >
               <ArrowLeft className="text-amber-500" size={20} />

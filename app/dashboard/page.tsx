@@ -57,8 +57,7 @@ export default function DashboardPage() {
   }
 
   const handleAddBarber = () => {
-    // TODO: Implement barber registration page
-    console.log('Adicionar barbeiro');
+    router.push('/barbers/register');
   };
 
   const handleAddService = () => {
