@@ -265,7 +265,10 @@ function MainContent() {
 
   const handleBarberSelect = (barberId: string) => {
     setSelectedBarber(barberId);
-    setActiveTab(TAB_CALENDAR);
+    setBarbers(barbers.map(barber => ({
+      ...barber,
+      selected: barber.id === barberId ? true : false
+    })));
   };
 
   const renderContent = () => {
@@ -425,6 +428,21 @@ function MainContent() {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-6">
+            <button
+              disabled={!selectedBarber}
+              onClick={() => {
+                if (selectedBarber) {
+                  setActiveTab(TAB_CALENDAR);
+                }
+              }}
+              className={`w-full font-bold text-sm py-3 rounded-full transition-colors duration-300 ${
+                selectedBarber ? 'bg-amber-500 text-black' : 'bg-gray-600 text-gray-300 cursor-not-allowed'
+              }`}
+            >
+              SELECIONAR DATA E HORA
+            </button>
           </div>
         </div>
       );
