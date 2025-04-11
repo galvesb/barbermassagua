@@ -29,6 +29,7 @@ function MainContent() {
   const TAB_SERVICES = 'SERVICES';
   const TAB_BARBERS = 'BARBERS';
   const TAB_CALENDAR = 'CALENDAR';
+  const TAB_TIMES = 'TIMES';
   const TAB_SUMMARY = 'SUMMARY';
 
   // Estados da aplicação
@@ -463,7 +464,7 @@ function MainContent() {
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(today.getFullYear(), today.getMonth(), day);
         const isToday = day === today.getDate();
-        const isSelected = date.toDateString() === selectedDate.toDateString();
+        const isSelected = selectedDate ? date.toDateString() === selectedDate.toDateString() : false;
         const isAvailable = isDayAvailable(date);
 
         calendarCells.push(
@@ -523,12 +524,48 @@ function MainContent() {
               <div className="grid grid-cols-7 gap-2 mb-4">
                 {calendarCells}
               </div>
-              {selectedDate && (
-                <>
-                  <p className="text-center text-sm font-bold mb-2">Horários disponíveis:</p>
-                  {renderTimes()}
-                </>
-              )}
+            </div>
+          </div>
+          {selectedDate && (
+            <div className="mt-auto">
+              <button
+                onClick={() => setActiveTab(TAB_TIMES)}
+                className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
+              >
+                SELECIONAR HORÁRIO
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (activeTab === TAB_TIMES) {
+      return (
+        <div className="bg-[#2a2a38] p-4 rounded-xl text-white text-sm h-full flex flex-col">
+          <div className="mb-4">
+            <div className="flex justify-between items-center">
+              <div className="text-center">
+                <p className="text-sm text-gray-400">Dia selecionado:</p>
+                <p className="text-lg font-bold">{selectedDate.getDate()}/{selectedDate.getMonth() + 1}/{selectedDate.getFullYear()}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedDate(null);
+                  setActiveTab(TAB_CALENDAR);
+                }}
+                className="text-gray-400 hover:text-amber-500 transition"
+              >
+                <ChevronLeft size={20} />
+              </button>
+            </div>
+          </div>
+          <div className="flex-1 relative">
+            <div className="absolute inset-0 overflow-y-auto scrollbar-none md:scrollbar-thin md:scrollbar-thumb-gray-600 md:scrollbar-track-transparent">
+              <div className="space-y-2">
+                <p className="text-center text-sm font-bold mb-2">Horários disponíveis:</p>
+                {renderTimes()}
+              </div>
             </div>
           </div>
           {selectedTime && (
@@ -594,6 +631,7 @@ function MainContent() {
             TAB_SERVICES,
             TAB_BARBERS,
             TAB_CALENDAR,
+            TAB_TIMES,
             ...(canShowSummary ? [TAB_SUMMARY] : [])
           ].map(tab => (
             <button
@@ -601,21 +639,23 @@ function MainContent() {
               onClick={() => {
                 if (tab === TAB_BARBERS && !hasSelected) return;
                 if (tab === TAB_CALENDAR && !hasSelectedBarber) return;
+                if (tab === TAB_TIMES && !selectedDate) return;
                 setActiveTab(tab);
               }}
-              className={`flex-1 py-2 rounded-full text-xs font-bold ${
+              className={`flex-1 py-2 rounded-full text-[0.7rem] font-bold ${
                 activeTab === tab ? 'bg-amber-500 text-black' : 'text-white'
               }`}
             >
               {tab === TAB_SERVICES ? 'SERVIÇOS' :
                tab === TAB_BARBERS ? 'BARBEIROS' :
-               tab === TAB_CALENDAR ? 'CALENDÁRIO' :
+               tab === TAB_CALENDAR ? 'DATA' :
+               tab === TAB_TIMES ? 'HORÁRIOS' :
                'RESUMO'}
             </button>
           ))}
         </div>
 
-        {activeTab === TAB_CALENDAR ? (
+        {activeTab === TAB_CALENDAR || activeTab === TAB_TIMES ? (
           <div className="flex-1">
             {renderContent()}
           </div>
