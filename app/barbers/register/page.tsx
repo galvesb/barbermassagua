@@ -78,15 +78,49 @@ export default function RegisterBarber() {
 
           if (scheduleError) throw scheduleError;
 
-          // Atualizar os horários no estado
-          if (scheduleData) {
-            setSchedules(scheduleData.map(s => ({
-              day: getValidDayOfWeek(s.day_of_week),
-              start_time: s.start_time,
-              end_time: s.end_time,
-              is_active: s.is_active
-            })));
+          // Se não houver horários, usar os padrões
+          if (!scheduleData || scheduleData.length === 0) {
+            setSchedules([
+              { day: 0, start_time: '08:00', end_time: '18:00', is_active: false },
+              { day: 1, start_time: '08:00', end_time: '18:00', is_active: false },
+              { day: 2, start_time: '08:00', end_time: '18:00', is_active: false },
+              { day: 3, start_time: '08:00', end_time: '18:00', is_active: false },
+              { day: 4, start_time: '08:00', end_time: '18:00', is_active: false },
+              { day: 5, start_time: '08:00', end_time: '18:00', is_active: false },
+              { day: 6, start_time: '08:00', end_time: '18:00', is_active: false }
+            ]);
+            return;
           }
+
+          // Se houver horários, usar os dados do banco
+          const schedules = scheduleData.map(s => ({
+            day: s.day_of_week,
+            start_time: s.start_time,
+            end_time: s.end_time,
+            is_active: s.is_active
+          }));
+
+          // Garantir que temos todos os dias da semana
+          const allDays = [
+            { day: 0, start_time: '08:00', end_time: '18:00', is_active: false },
+            { day: 1, start_time: '08:00', end_time: '18:00', is_active: true },
+            { day: 2, start_time: '08:00', end_time: '18:00', is_active: false },
+            { day: 3, start_time: '08:00', end_time: '18:00', is_active: false },
+            { day: 4, start_time: '08:00', end_time: '18:00', is_active: false },
+            { day: 5, start_time: '08:00', end_time: '18:00', is_active: false },
+            { day: 6, start_time: '08:00', end_time: '18:00', is_active: false }
+          ];
+
+          // Atualizar os dias que têm horários cadastrados
+          schedules.forEach(s => {
+            const dayIndex = allDays.findIndex(d => d.day === s.day);
+            if (dayIndex !== -1) {
+              allDays[dayIndex] = s;
+            }
+          });
+
+          setSchedules(allDays);
+
         } catch (error) {
           console.error('Erro ao buscar dados do barbeiro:', error);
           setError('Erro ao carregar dados do barbeiro');
