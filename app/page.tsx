@@ -45,6 +45,8 @@ function MainContent() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [barberSchedules, setBarberSchedules] = useState<{[key: number]: {is_active: boolean, start_time: string, end_time: string}}>({});
+  const [isBarberSchedulesLoaded, setIsBarberSchedulesLoaded] = useState(false);
 
   // Função para buscar serviços do banco de dados
   const fetchServices = async () => {
@@ -131,23 +133,117 @@ function MainContent() {
   }, [user]);
 
   useEffect(() => {
-    const body = document.body;
-    const html = document.documentElement;
+    const loadBarberSchedules = async () => {
+      if (!selectedBarber) return;
 
-    // Check if it's mobile
-    const isMobile = window.innerWidth <= 768;
+      try {
+        const { data: scheduleData, error: scheduleError } = await supabase
+          .from('barber_schedules')
+          .select('*')
+          .eq('barber_id', selectedBarber);
 
-    if (isMobile) {
-      body.style.overflow = 'hidden';
-      html.style.overflow = 'hidden';
+        if (scheduleError) throw scheduleError;
+
+        const schedulesByDay = {};
+        // Inicializar todos os dias da semana como inativos
+        for (let i = 0; i <= 7; i++) { 
+          schedulesByDay[i] = {
+            is_active: false,
+            start_time: '00:00',
+            end_time: '00:00'
+          };
+        }
+
+        // Atualizar apenas os dias que o barbeiro trabalha
+        scheduleData?.forEach(schedule => {
+          schedulesByDay[schedule.day_of_week] = {
+            is_active: schedule.is_active,
+            start_time: schedule.start_time,
+            end_time: schedule.end_time
+          };
+        });
+
+        console.log('Horários do barbeiro:', schedulesByDay);
+
+        setBarberSchedules(schedulesByDay);
+        setIsBarberSchedulesLoaded(true);
+      } catch (error) {
+        console.error('Erro ao carregar horários:', error);
+        setIsBarberSchedulesLoaded(true);
+      }
+    };
+
+    loadBarberSchedules();
+  }, [selectedBarber]);
+
+  const isDayAvailable = (date: Date) => {
+    if (!selectedBarber) return false;
+
+    const dayOfWeek = date.getDay();
+    // Ajustar para o formato do banco (0-7)
+    const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
+    const schedule = barberSchedules[adjustedDay];
+    
+    return schedule?.is_active ?? false;
+  };
+
+  const renderTimes = () => {
+    if (!selectedBarber) return null;
+
+    const dayOfWeek = selectedDate.getDay();
+    // Ajustar para o formato do banco (0-7)
+    const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
+    const schedule = barberSchedules[adjustedDay];
+    
+    if (!schedule?.is_active) {
+      return (
+        <div className="text-center text-gray-600 py-4">
+          Sem horários disponíveis neste dia
+        </div>
+      );
     }
 
-    // Cleanup on unmount
-    return () => {
-      body.style.overflow = '';
-      html.style.overflow = '';
-    };
-  }, []);
+    const [startHour, startMinute] = schedule.start_time.split(':').map(Number);
+    const [endHour, endMinute] = schedule.end_time.split(':').map(Number);
+    
+    const times = [];
+    let currentHour = startHour;
+    let currentMinute = startMinute;
+
+    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
+      const time = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+      times.push(time);
+
+      if (currentMinute === 30) {
+        currentHour++;
+        currentMinute = 0;
+      } else {
+        currentMinute = 30;
+      }
+    }
+
+    return (
+      <div className="grid grid-cols-4 gap-1 text-center text-black text-xs mb-4">
+        {times.map((time) => {
+          const isSelected = selectedTime === time;
+
+          return (
+            <div
+              key={time}
+              onClick={() => setSelectedTime(time)}
+              className={`rounded-full py-1 px-2 cursor-pointer transition whitespace-nowrap text-white text-xs text-center ${
+                isSelected
+                  ? 'bg-green-600'
+                  : 'bg-amber-500 hover:bg-amber-600'
+              }`}
+            >
+              {time}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   const toggleService = (index) => {
     const updated = [...services];
@@ -170,6 +266,11 @@ function MainContent() {
   };
 
   const canShowSummary = selectedDate && selectedTime;
+
+  const handleBarberSelect = (barberId: string) => {
+    setSelectedBarber(barberId);
+    setActiveTab(TAB_CALENDAR);
+  };
 
   const renderContent = () => {
     if (activeTab === TAB_SUMMARY) {
@@ -309,7 +410,7 @@ function MainContent() {
             {barbers.map((barber, index) => (
               <div
                 key={index}
-                onClick={() => toggleBarber(index)}
+                onClick={() => handleBarberSelect(barber.id)}
                 className="flex items-center justify-between bg-[#2a2a38] p-4 rounded-xl mb-3 cursor-pointer"
               >
                 <div className="flex items-center space-x-3">
@@ -329,17 +430,6 @@ function MainContent() {
               </div>
             ))}
           </div>
-          <div className="mt-6">
-            <button
-              disabled={!hasSelectedBarber}
-              onClick={() => hasSelectedBarber && setActiveTab(TAB_CALENDAR)}
-              className={`w-full font-bold text-sm py-3 rounded-full transition-colors duration-300 ${
-                hasSelectedBarber ? 'bg-amber-500 text-black' : 'bg-gray-600 text-gray-300 cursor-not-allowed'
-              }`}
-            >
-              SELECIONAR DATA E HORA
-            </button>
-          </div>
         </div>
       );
     }
@@ -355,15 +445,30 @@ function MainContent() {
       for (let i = 0; i < startDay; i++) {
         calendarCells.push(<div key={`empty-${i}`} className="text-gray-600"> </div>);
       }
+
       for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(today.getFullYear(), today.getMonth(), day);
         const isToday = day === today.getDate();
+        const isSelected = date.toDateString() === selectedDate.toDateString();
+        const isAvailable = isDayAvailable(date);
+
         calendarCells.push(
           <div
             key={day}
-            onClick={() => setSelectedDate(new Date(today.getFullYear(), today.getMonth(), day))}
+            onClick={() => {
+              if (isAvailable) {
+                setSelectedDate(date);
+              }
+            }}
             className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors duration-200 cursor-pointer ${
-              selectedDate.getDate() === day ? 'bg-green-600 text-white' : isToday ? 'bg-amber-700 text-black' : 'text-white hover:bg-amber-600 hover:text-black'
-            }`}
+              isSelected
+                ? 'bg-green-600 text-white'
+                : isToday
+                  ? 'bg-amber-700 text-black'
+                  : isAvailable
+                    ? 'text-white hover:bg-amber-600 hover:text-black'
+                    : 'text-gray-600'
+            } ${!isAvailable ? 'cursor-not-allowed' : ''}`}
           >
             {day}
           </div>
@@ -375,8 +480,29 @@ function MainContent() {
           <div className="text-center font-bold text-base mb-4">
             {currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)} {currentYear}
           </div>
-          <div className="grid grid-cols-7 gap-2 text-center text-amber-500 mb-2 text-xs font-semibold">
-            <div>DOM</div><div>SEG</div><div>TER</div><div>QUA</div><div>QUI</div><div>SEX</div><div>SAB</div>
+          <div className="grid grid-cols-7 gap-2 text-center mb-2 text-xs font-semibold">
+            {selectedBarber ? (
+              ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'].map((dayName, index) => {
+                // Ajustar índice para corresponder ao banco (0-7)
+                const adjustedIndex = index === 0 ? 7 : index - 1;
+                const isDayAvailable = barberSchedules[adjustedIndex]?.is_active;
+                
+                return (
+                  <div 
+                    key={dayName}
+                    className={`px-1 py-0.5 rounded ${
+                      isDayAvailable ? 'bg-amber-500 text-black' : 'bg-gray-600 text-white'
+                    }`}
+                  >
+                    {dayName}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="col-span-7 text-center text-gray-600 py-4">
+                Selecione um barbeiro para ver os horários disponíveis
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-7 gap-2 mb-4">
             {calendarCells}
@@ -385,19 +511,7 @@ function MainContent() {
           {selectedDate && (
             <>
               <p className="text-center text-sm font-bold mb-2">Horários disponíveis:</p>
-              <div className="grid grid-cols-4 gap-1 text-center text-black text-xs mb-4">
-                {["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"].map((hour, i) => (
-                  <div
-                    key={i}
-                    onClick={() => setSelectedTime(hour)}
-                    className={`rounded-full py-1 px-2 cursor-pointer transition whitespace-nowrap text-white text-xs text-center ${
-                      selectedTime === hour ? 'bg-green-600' : 'bg-amber-500 hover:bg-amber-600'
-                    }`}
-                  >
-                    {hour}
-                  </div>
-                ))}
-              </div>
+              {renderTimes()}
               {selectedTime && (
                 <button
                   onClick={handleFinalizar}
