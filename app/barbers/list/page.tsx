@@ -216,7 +216,7 @@ export default function BarbersList() {
                       <Pencil className="text-amber-500" size={16} />
                     </button>
                     <button 
-                      onClick={() => router.push(`/barbers/delete?id=${barber.id}`)}
+                      onClick={() => router.push(`/barbers/delete?id=${barber.profile_id}`)}
                       className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 transition-colors"
                     >
                       <Trash className="text-red-500" size={16} />
