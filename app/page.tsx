@@ -339,7 +339,10 @@ function MainContent() {
                 <h3 className="font-semibold mb-2">Data e Horário</h3>
                 <div className="flex flex-col bg-[#1f1f29] p-3 rounded-lg">
                   <span className="text-sm">{selectedDate ? `${selectedDate.getDate()}/${new Date().toLocaleString('default', { month: 'long' })}/${new Date().getFullYear()}` : 'Data não selecionada'}</span>
-                  <span className="text-sm mt-1">{selectedTime || 'Horário não selecionado'}</span>
+                  <span className="text-sm">
+                    {selectedTime ? selectedTime : 'Horário não selecionado'}
+                    {selectedTime && totalDuration > 0 && ` - ${calculateEndTime(selectedTime, totalDuration)}`}
+                  </span>
                 </div>
               </div>
             </div>
@@ -674,6 +677,16 @@ function MainContent() {
       console.error('Erro ao agendar:', error);
       alert('Erro ao agendar. Por favor, tente novamente.');
     }
+  };
+
+  // Função para calcular o horário final
+  const calculateEndTime = (startTime: string, durationMinutes: number) => {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + durationMinutes;
+    const endHours = Math.floor(totalMinutes / 60);
+    const endMinutes = totalMinutes % 60;
+    
+    return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
   };
 
   // Função para formatar duração em horas e minutos
