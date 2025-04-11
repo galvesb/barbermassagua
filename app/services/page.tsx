@@ -273,16 +273,33 @@ export default function Services() {
                   id="serviceDuration"
                   value={serviceDuration}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9:]/g, '');
-                    if (value.length <= 5 && value.match(/^(\d{0,2}):(\d{0,2})$/)) {
-                      setServiceDuration(value);
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    if (value.length === 0) {
+                      setServiceDuration('');
+                      return;
                     }
+                    
+                    // Calculate minutes and hours based on length
+                    const minutes = value.slice(-2);
+                    const hours = value.slice(0, -2);
+                    
+                    // Remove leading zeros from hours
+                    const cleanedHours = hours.replace(/^0+/, '');
+                    const formattedHours = cleanedHours || '00';
+                    
+                    // Format parts
+                    const formattedMinutes = minutes.padStart(2, '0');
+                    
+                    // Combine parts
+                    const formattedValue = `${formattedHours}:${formattedMinutes}`;
+                    
+                    setServiceDuration(formattedValue);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Backspace' || e.key === 'Delete') {
                       return;
                     }
-                    if (e.key !== ':' && !/[0-9]/.test(e.key)) {
+                    if (!/[0-9]/.test(e.key)) {
                       e.preventDefault();
                     }
                   }}
