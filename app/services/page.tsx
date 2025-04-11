@@ -307,19 +307,6 @@ export default function Services() {
                   className="w-full pl-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
                   required
                 />
-                <p className="mt-1 text-sm text-gray-400">
-                  {serviceDuration ? 
-                    serviceDuration === '00:01' ? '1 minuto' :
-                    serviceDuration === '00:11' ? '11 minutos' :
-                    serviceDuration === '11:00' ? '11 horas' :
-                    serviceDuration === '11:11' ? '11 horas e 11 minutos' :
-                    // For other values, calculate hours and minutes
-                    serviceDuration.split(':')[1] === '00' 
-                      ? `${serviceDuration.split(':')[0]} horas` 
-                      : `${serviceDuration.split(':')[0]} horas e ${serviceDuration.split(':')[1]} minutos`
-                    : '00:01 = 1 minuto<br />00:11 = 11 minutos<br />11:00 = 11 horas<br />11:11 = 11 horas e 11 minutos'
-                  }
-                </p>
               </div>
 
               <div>
