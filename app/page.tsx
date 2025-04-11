@@ -24,6 +24,37 @@ const getIconForService = (iconName: string) => {
   }
 };
 
+// Função para formatar horário
+const formatTime = (timeStr: string): string => {
+  const timeParts = timeStr.split(':');
+  if (timeParts.length === 2) {
+    return `${timeParts[0].padStart(2, '0')}:${timeParts[1].padStart(2, '0')}:00`;
+  }
+  return '00:00:00';
+};
+
+// Função para calcular o horário final
+const calculateEndTime = (startTime: string, durationMinutes: number) => {
+  const [hours, minutes] = startTime.split(':').map(Number);
+  const totalMinutes = hours * 60 + minutes + durationMinutes;
+  const endHours = Math.floor(totalMinutes / 60);
+  const endMinutes = totalMinutes % 60;
+  
+  return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+};
+
+// Função para formatar duração em horas e minutos
+const formatDuration = (minutes: number) => {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  
+  if (hours === 1 && remainingMinutes === 0) {
+    return "1h";
+  }
+  
+  return `${hours}h ${remainingMinutes}min`;
+};
+
 function MainContent() {
   // Definindo constantes para os tabs
   const TAB_SERVICES = 'SERVICES';
@@ -350,7 +381,7 @@ function MainContent() {
 
           <div className="mt-auto">
             <button
-              onClick={handleAgendar}
+              onClick={() => handleAgendar(selectedTime, totalDuration)}
               className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
             >
               Agendar
@@ -588,7 +619,7 @@ function MainContent() {
     /Chrome/.test(navigator.userAgent) && 
     /Android/.test(navigator.userAgent);
 
-  const handleAgendar = async () => {
+  const handleAgendar = async (selectedTime: string | null, totalDuration: number) => {
     try {
       if (!user || !selectedBarber || !selectedDate || !selectedTime) {
         alert('Por favor, selecione todos os campos obrigatórios');
@@ -609,23 +640,11 @@ function MainContent() {
       console.log('Selected Services:', selectedServices);
       console.log('Selected Date:', selectedDate);
       console.log('Selected Time:', selectedTime);
+      console.log('Total Duration:', totalDuration);
 
       // Calculate end time based on service durations
-      const totalDuration = selectedServices.reduce((acc, service) => acc + service.duration_minutes, 0);
-      const startTime = new Date(`${selectedDate.toISOString().split('T')[0]}T${selectedTime}`);
-      const endTime = new Date(startTime.getTime() + totalDuration * 60 * 1000);
-
-      // Format times correctly for Supabase
-      const formatTime = (timeStr: string): string => {
-        const timeParts = timeStr.split(':');
-        if (timeParts.length === 2) {
-          return `${timeParts[0].padStart(2, '0')}:${timeParts[1].padStart(2, '0')}:00`;
-        }
-        return '00:00:00';
-      };
-
-      const formattedStartTime = formatTime(selectedTime || '00:00');
-      const formattedEndTime = formatTime(endTime.toTimeString().split(' ')[0]);
+      const formattedStartTime = formatTime(selectedTime);
+      const formattedEndTime = calculateEndTime(selectedTime, totalDuration);
 
       // Create appointment in Supabase
       const { data, error: appointmentError } = await supabase
@@ -677,28 +696,6 @@ function MainContent() {
       console.error('Erro ao agendar:', error);
       alert('Erro ao agendar. Por favor, tente novamente.');
     }
-  };
-
-  // Função para calcular o horário final
-  const calculateEndTime = (startTime: string, durationMinutes: number) => {
-    const [hours, minutes] = startTime.split(':').map(Number);
-    const totalMinutes = hours * 60 + minutes + durationMinutes;
-    const endHours = Math.floor(totalMinutes / 60);
-    const endMinutes = totalMinutes % 60;
-    
-    return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
-  };
-
-  // Função para formatar duração em horas e minutos
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    
-    if (hours === 1 && remainingMinutes === 0) {
-      return "1h";
-    }
-    
-    return `${hours}h ${remainingMinutes}min`;
   };
 
   return (
