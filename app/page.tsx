@@ -37,6 +37,7 @@ function MainContent() {
   const [services, setServices] = useState([]);
   const [barbers, setBarbers] = useState([]);
   const [total, setTotal] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(0);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
@@ -111,7 +112,9 @@ function MainContent() {
 
   useEffect(() => {
     const sum = services.reduce((acc, item) => item.selected ? acc + item.value : acc, 0);
+    const durationSum = services.reduce((acc, item) => item.selected ? acc + (Number(item.duration) || 0) : acc, 0);
     setTotal(sum);
+    setTotalDuration(durationSum);
     setHasSelected(services.some(service => service.selected));
   }, [services]);
 
@@ -317,6 +320,10 @@ function MainContent() {
                 <div className="flex justify-between items-center mt-3">
                   <span className="font-bold">Total</span>
                   <span className="text-amber-500 font-bold">R${total.toFixed(2).replace('.', ',')}</span>
+                </div>
+                <div className="flex justify-between items-center mt-3">
+                  <span className="font-bold">Duração</span>
+                  <span className="text-amber-500 font-bold">{formatDuration(totalDuration)}</span>
                 </div>
               </div>
 
@@ -669,6 +676,18 @@ function MainContent() {
     }
   };
 
+  // Função para formatar duração em horas e minutos
+  const formatDuration = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    
+    if (hours === 1 && remainingMinutes === 0) {
+      return "1h";
+    }
+    
+    return `${hours}h ${remainingMinutes}min`;
+  };
+
   return (
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
       <div 
@@ -701,6 +720,7 @@ function MainContent() {
               </button>
               <div className="text-right">
                 <p className="text-sm text-amber-400">Total: R${total.toFixed(2).replace('.', ',')}</p>
+                <p className="text-sm text-amber-400">Duração: {formatDuration(totalDuration)}</p>
               </div>
             </div>
           </div>
