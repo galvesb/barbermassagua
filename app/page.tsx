@@ -6,12 +6,23 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/useAuth';
 import { supabase } from '../lib/supabaseClient';
 
-const initialBarbers = [
-  { name: "Guilherme Barros", role: "Especialista em cortes", icon: <Menu />, selected: false },
-  { name: "Marcos Silva", role: "Barbeiro tradicional", icon: <Menu />, selected: false },
-  { name: "João Souza", role: "Fade e navalhado", icon: <Menu />, selected: false },
-  { name: "Pedro Lima", role: "Designer de barba", icon: <Menu />, selected: false },
-];
+// Função auxiliar para obter ícone baseado no nome do ícone
+const getIconForService = (iconName: string) => {
+  switch (iconName) {
+    case 'Scissors':
+      return <Scissors />;
+    case 'SprayCan':
+      return <SprayCan />;
+    case 'Brush':
+      return <Brush />;
+    case 'Bath':
+      return <Bath />;
+    case 'Wand2':
+      return <Wand2 />;
+    default:
+      return <Scissors />;
+  }
+};
 
 function MainContent() {
   // Definindo constantes para os tabs
@@ -23,7 +34,7 @@ function MainContent() {
   // Estados da aplicação
   const [activeTab, setActiveTab] = useState(TAB_SERVICES);
   const [services, setServices] = useState([]);
-  const [barbers, setBarbers] = useState(initialBarbers);
+  const [barbers, setBarbers] = useState([]);
   const [total, setTotal] = useState(0);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -62,26 +73,34 @@ function MainContent() {
     }
   };
 
-  // Função auxiliar para obter ícone baseado no nome do ícone
-  const getIconForService = (iconName: string) => {
-    switch (iconName) {
-      case 'Scissors':
-        return <Scissors />;
-      case 'SprayCan':
-        return <SprayCan />;
-      case 'Brush':
-        return <Brush />;
-      case 'Bath':
-        return <Bath />;
-      case 'Wand2':
-        return <Wand2 />;
-      default:
-        return <Scissors />;
+  // Função para buscar barbeiros do banco de dados
+  const fetchBarbers = async () => {
+    try {
+      const { data: barberData, error: barberError } = await supabase
+        .from('barbers')
+        .select('*, profiles!inner(*)')
+        .order('created_at', { ascending: false });
+
+      if (barberError) throw barberError;
+
+      // Transformar os dados para o formato esperado
+      const formattedBarbers = barberData?.map(barber => ({
+        id: barber.id,
+        name: barber.profiles.name,
+        role: barber.profiles.role || "Barbeiro",
+        icon: <Menu />,
+        selected: false
+      })) || [];
+
+      setBarbers(formattedBarbers);
+    } catch (error) {
+      console.error('Erro ao carregar barbeiros:', error);
     }
   };
 
   useEffect(() => {
     fetchServices();
+    fetchBarbers();
   }, []);
 
   useEffect(() => {
@@ -223,7 +242,10 @@ function MainContent() {
                   ...service,
                   selected: false
                 })));
-                setBarbers(initialBarbers);
+                setBarbers(barbers.map(barber => ({
+                  ...barber,
+                  selected: false
+                })));
                 setSelectedDate(new Date());
                 setSelectedTime(null);
                 setActiveTab(TAB_SERVICES);
