@@ -60,14 +60,17 @@ function MainContent() {
       if (error) throw error;
 
       const formattedServices = servicesData.map(service => ({
+        id: service.id,
         name: service.name,
         price: `R$${service.price.toFixed(2).replace('.', ',')}`,
         value: service.price,
         icon: getIconForService(service.icon),
         selected: false,
-        duration: service.duration
+        duration: service.duration_minutes,
+        service_id: service.id // Adicionando explicitamente o service_id
       }));
 
+      console.log('Serviços carregados:', formattedServices);
       setServices(formattedServices);
     } catch (error) {
       console.error('Erro ao buscar serviços:', error);
@@ -337,21 +340,7 @@ function MainContent() {
 
           <div className="mt-auto">
             <button
-              onClick={() => {
-                setHasSelected(false);
-                setServices(services.map(service => ({
-                  ...service,
-                  selected: false
-                })));
-                setBarbers(barbers.map(barber => ({
-                  ...barber,
-                  selected: false
-                })));
-                setSelectedDate(new Date());
-                setSelectedTime(null);
-                setActiveTab(TAB_SERVICES);
-                window.location.href = '/confirmation';
-              }}
+              onClick={handleAgendar}
               className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
             >
               Agendar
@@ -571,10 +560,10 @@ function MainContent() {
           {selectedTime && (
             <div className="mt-auto">
               <button
-                onClick={handleFinalizar}
+                onClick={() => setActiveTab(TAB_SUMMARY)}
                 className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
               >
-                FINALIZAR
+                Resumo
               </button>
             </div>
           )}
@@ -588,6 +577,97 @@ function MainContent() {
   const isMobileChrome = typeof navigator !== 'undefined' && 
     /Chrome/.test(navigator.userAgent) && 
     /Android/.test(navigator.userAgent);
+
+  const handleAgendar = async () => {
+    try {
+      if (!user || !selectedBarber || !selectedDate || !selectedTime) {
+        alert('Por favor, selecione todos os campos obrigatórios');
+        return;
+      }
+
+      // Get selected services
+      const selectedServices = services.filter(service => service.selected);
+      if (selectedServices.length === 0) {
+        alert('Por favor, selecione pelo menos um serviço');
+        return;
+      }
+
+      // Log para debug
+      console.log('Dados do agendamento:');
+      console.log('User ID:', user.id);
+      console.log('Barber ID:', selectedBarber);
+      console.log('Selected Services:', selectedServices);
+      console.log('Selected Date:', selectedDate);
+      console.log('Selected Time:', selectedTime);
+
+      // Calculate end time based on service durations
+      const totalDuration = selectedServices.reduce((acc, service) => acc + service.duration_minutes, 0);
+      const startTime = new Date(`${selectedDate.toISOString().split('T')[0]}T${selectedTime}`);
+      const endTime = new Date(startTime.getTime() + totalDuration * 60 * 1000);
+
+      // Format times correctly for Supabase
+      const formatTime = (timeStr: string): string => {
+        const timeParts = timeStr.split(':');
+        if (timeParts.length === 2) {
+          return `${timeParts[0].padStart(2, '0')}:${timeParts[1].padStart(2, '0')}:00`;
+        }
+        return '00:00:00';
+      };
+
+      const formattedStartTime = formatTime(selectedTime || '00:00');
+      const formattedEndTime = formatTime(endTime.toTimeString().split(' ')[0]);
+
+      // Create appointment in Supabase
+      const { data, error: appointmentError } = await supabase
+        .from('appointments')
+        .insert([{
+          profile_id: user.id,
+          barber_id: selectedBarber,
+          service_ids: selectedServices.map(service => service.id),
+          scheduled_date: selectedDate.toISOString().split('T')[0],
+          start_time: formattedStartTime,
+          end_time: formattedEndTime,
+          status: 'scheduled',
+          notes: selectedServices.map(service => `${service.name} - R$${service.price}`).join(', '),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
+        .select();
+
+      if (appointmentError) {
+        console.error('Erro ao criar agendamento:', appointmentError);
+        throw appointmentError;
+      }
+
+      console.log('Agendamento criado com sucesso:', data);
+      
+      // Reset form
+      setSelectedBarber(null);
+      setSelectedDate(new Date());
+      setSelectedTime(null);
+      setShowSummary(false);
+      setActiveTab(TAB_SERVICES);
+      
+      // Reset services selection
+      setServices(services.map(service => ({
+        ...service,
+        selected: false
+      })));
+
+      // Reset barbers selection
+      setBarbers(barbers.map(barber => ({
+        ...barber,
+        selected: false
+      })));
+
+      // Redirecionar para a tela de confirmação
+      window.location.href = '/confirmation';
+
+    } catch (error) {
+      console.error('Erro ao agendar:', error);
+      alert('Erro ao agendar. Por favor, tente novamente.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#2a2a38] flex items-center justify-center p-4">
