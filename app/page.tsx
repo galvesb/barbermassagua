@@ -491,49 +491,55 @@ function MainContent() {
 
       return (
         <div className="bg-[#2a2a38] p-4 rounded-xl text-white text-sm h-full flex flex-col">
-          <div className="text-center font-bold text-base mb-4">
-            {currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)} {currentYear}
-          </div>
-          <div className="grid grid-cols-7 gap-2 text-center mb-2 text-xs font-semibold">
-            {selectedBarber ? (
-              ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'].map((dayName, index) => {
-                // Sem ajuste necessário, já está no formato correto (0-6)
-                const isDayAvailable = barberSchedules[index]?.is_active;
-                
-                return (
-                  <div 
-                    key={dayName}
-                    className={`px-1 py-0.5 rounded ${
-                      isDayAvailable ? 'bg-amber-500 text-black' : 'bg-gray-600 text-white'
-                    }`}
-                  >
-                    {dayName}
-                  </div>
-                );
-              })
-            ) : (
-              <div className="col-span-7 text-center text-gray-600 py-4">
-                Selecione um barbeiro para ver os horários disponíveis
-              </div>
-            )}
-          </div>
-          <div className="grid grid-cols-7 gap-2 mb-4">
-            {calendarCells}
-          </div>
-
-          {selectedDate && (
-            <>
-              <p className="text-center text-sm font-bold mb-2">Horários disponíveis:</p>
-              {renderTimes()}
-              {selectedTime && (
-                <button
-                  onClick={handleFinalizar}
-                  className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
-                >
-                  FINALIZAR
-                </button>
+          <div className="mb-4">
+            <div className="text-center font-bold text-base mb-4">
+              {currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)} {currentYear}
+            </div>
+            <div className="grid grid-cols-7 gap-2 text-center mb-2 text-xs font-semibold">
+              {selectedBarber ? (
+                ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'].map((dayName, index) => {
+                  const isDayAvailable = barberSchedules[index]?.is_active;
+                  
+                  return (
+                    <div 
+                      key={dayName}
+                      className={`px-1 py-0.5 rounded ${
+                        isDayAvailable ? 'bg-amber-500 text-black' : 'bg-gray-600 text-white'
+                      }`}
+                    >
+                      {dayName}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="col-span-7 text-center text-gray-600 py-4">
+                  Selecione um barbeiro para ver os horários disponíveis
+                </div>
               )}
-            </>
+            </div>
+          </div>
+          <div className="flex-1 relative">
+            <div className="absolute inset-0 overflow-y-auto scrollbar-none md:scrollbar-thin md:scrollbar-thumb-gray-600 md:scrollbar-track-transparent">
+              <div className="grid grid-cols-7 gap-2 mb-4">
+                {calendarCells}
+              </div>
+              {selectedDate && (
+                <>
+                  <p className="text-center text-sm font-bold mb-2">Horários disponíveis:</p>
+                  {renderTimes()}
+                </>
+              )}
+            </div>
+          </div>
+          {selectedTime && (
+            <div className="mt-auto">
+              <button
+                onClick={handleFinalizar}
+                className="w-full font-bold text-sm py-3 rounded-full bg-amber-500 text-black hover:bg-amber-600 transition"
+              >
+                FINALIZAR
+              </button>
+            </div>
           )}
         </div>
       );
