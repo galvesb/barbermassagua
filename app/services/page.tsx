@@ -230,9 +230,36 @@ export default function Services() {
                   type="text"
                   id="servicePrice"
                   value={servicePrice}
-                  onChange={(e) => setServicePrice(e.target.value)}
-                  className="w-full bg-[#2a2a38] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    if (value.length === 0) {
+                      setServicePrice('');
+                      return;
+                    }
+                    
+                    // Calculate decimal places based on length
+                    const decimalPlaces = value.length <= 2 ? value.length : 2;
+                    const integerPart = value.slice(0, -decimalPlaces);
+                    const decimalPart = value.slice(-decimalPlaces);
+                    
+                    // Format with thousand separators
+                    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    
+                    // Combine parts
+                    const formattedValue = formattedInteger + ',' + decimalPart;
+                    
+                    setServicePrice(`R$ ${formattedValue}`);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Backspace' || e.key === 'Delete') {
+                      return;
+                    }
+                    if (!/[0-9]/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
                   placeholder="R$ 0,00"
+                  className="w-full pl-4 py-3 rounded-lg bg-[#2a2a38] border border-gray-600 text-white text-sm focus:outline-none focus:border-amber-500"
                   required
                 />
               </div>
