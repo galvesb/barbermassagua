@@ -24,7 +24,8 @@ export default function RegisterBarber() {
   const [error, setError] = useState<string | null>(null);
   const [barber, setBarber] = useState<any>({
     name: '',
-    phone: ''
+    phone: '',
+    cpf: ''
   });
   const [schedules, setSchedules] = useState<any[]>([
     { day: 0, start_time: '08:00', end_time: '18:00', is_active: false },
@@ -72,7 +73,7 @@ export default function RegisterBarber() {
 
     try {
       // 1. Criar um novo usuário no Supabase Auth
-      const email = `${barber.name.toLowerCase().replace(/[^a-z0-9]/g, '')}@barbermassagua.com`;
+      const email = `${barber.cpf}@barbermassagua.com`;
       const password = '123456';
 
       // Criar um novo cliente do Supabase apenas para este registro
@@ -121,7 +122,8 @@ export default function RegisterBarber() {
         .from('barbers')
         .insert([{
           profile_id: authData.user.id, // Usando o ID do perfil
-          phone: barber.phone
+          phone: barber.phone,
+          cpf: barber.cpf
         }])
         .select()
         .single();
@@ -148,7 +150,7 @@ export default function RegisterBarber() {
       }
 
       // Limpar formulário após sucesso
-      setBarber({ name: '', phone: '' });
+      setBarber({ name: '', phone: '', cpf: '' });
       setSchedules([
         { day: 0, start_time: '08:00', end_time: '18:00', is_active: false },
         { day: 1, start_time: '08:00', end_time: '18:00', is_active: true },
@@ -224,6 +226,17 @@ export default function RegisterBarber() {
                     name="phone"
                     placeholder="Telefone"
                     value={barber.phone}
+                    onChange={handleInputChange}
+                    className="w-full bg-[#3a3a48] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <input
+                    type="text"
+                    name="cpf"
+                    placeholder="CPF"
+                    value={barber.cpf}
                     onChange={handleInputChange}
                     className="w-full bg-[#3a3a48] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                   />
