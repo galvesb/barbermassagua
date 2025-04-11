@@ -145,8 +145,8 @@ function MainContent() {
         if (scheduleError) throw scheduleError;
 
         const schedulesByDay = {};
-        // Inicializar todos os dias da semana como inativos
-        for (let i = 0; i <= 7; i++) { 
+        // Inicializar todos os dias da semana como inativos (0-6)
+        for (let i = 0; i <= 6; i++) { 
           schedulesByDay[i] = {
             is_active: false,
             start_time: '00:00',
@@ -163,8 +163,6 @@ function MainContent() {
           };
         });
 
-        console.log('Horários do barbeiro:', schedulesByDay);
-
         setBarberSchedules(schedulesByDay);
         setIsBarberSchedulesLoaded(true);
       } catch (error) {
@@ -180,9 +178,8 @@ function MainContent() {
     if (!selectedBarber) return false;
 
     const dayOfWeek = date.getDay();
-    // Ajustar para o formato do banco (0-7)
-    const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
-    const schedule = barberSchedules[adjustedDay];
+    // Sem ajuste necessário, já está no formato correto (0-6)
+    const schedule = barberSchedules[dayOfWeek];
     
     return schedule?.is_active ?? false;
   };
@@ -191,9 +188,8 @@ function MainContent() {
     if (!selectedBarber) return null;
 
     const dayOfWeek = selectedDate.getDay();
-    // Ajustar para o formato do banco (0-7)
-    const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
-    const schedule = barberSchedules[adjustedDay];
+    // Sem ajuste necessário, já está no formato correto (0-6)
+    const schedule = barberSchedules[dayOfWeek];
     
     if (!schedule?.is_active) {
       return (
@@ -483,9 +479,8 @@ function MainContent() {
           <div className="grid grid-cols-7 gap-2 text-center mb-2 text-xs font-semibold">
             {selectedBarber ? (
               ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'].map((dayName, index) => {
-                // Ajustar índice para corresponder ao banco (0-7)
-                const adjustedIndex = index === 0 ? 7 : index - 1;
-                const isDayAvailable = barberSchedules[adjustedIndex]?.is_active;
+                // Sem ajuste necessário, já está no formato correto (0-6)
+                const isDayAvailable = barberSchedules[index]?.is_active;
                 
                 return (
                   <div 
