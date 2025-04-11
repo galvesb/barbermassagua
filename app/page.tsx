@@ -220,7 +220,7 @@ function MainContent() {
     }
 
     return (
-      <div className="grid grid-cols-4 gap-1 text-center text-black text-xs mb-4">
+      <div className="grid grid-cols-4 gap-2 text-center text-black text-sm mb-4">
         {times.map((time) => {
           const isSelected = selectedTime === time;
 
@@ -228,10 +228,10 @@ function MainContent() {
             <div
               key={time}
               onClick={() => setSelectedTime(time)}
-              className={`rounded-full py-1 px-2 cursor-pointer transition whitespace-nowrap text-white text-xs text-center ${
+              className={`rounded-full py-2 px-3 cursor-pointer transition whitespace-nowrap text-white text-sm text-center ${
                 isSelected
-                  ? 'bg-green-600'
-                  : 'bg-amber-500 hover:bg-amber-600'
+                  ? 'bg-amber-500 hover:bg-amber-600'
+                  : 'bg-[#1f1f29] hover:bg-amber-500'
               }`}
             >
               {time}
