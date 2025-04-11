@@ -210,7 +210,7 @@ export default function BarbersList() {
                   </div>
                   <div className="flex-1 flex justify-center gap-4">
                     <button 
-                      onClick={() => router.push(`/barbers?id=${barber.id}`)} 
+                      onClick={() => router.push(`/barbers/register?id=${barber.id}`)} 
                       className="p-2 rounded-lg hover:bg-amber-500/20 transition-colors"
                     >
                       <Pencil className="text-amber-500" size={16} />
